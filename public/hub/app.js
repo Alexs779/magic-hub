@@ -18,15 +18,38 @@
     } catch (e) {}
   }
 
-  // Native haptic feedback
+  // --- TACTILE STEALTH HAPTIC ENGINE ---
   function triggerHaptic(type = 'light') {
     if (tg?.HapticFeedback) {
-      if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
-      else if (type === 'error') tg.HapticFeedback.notificationOccurred('error');
-      else if (type === 'medium') tg.HapticFeedback.impactOccurred('medium');
-      else tg.HapticFeedback.impactOccurred('light');
+      switch (type) {
+        case 'selection':
+          tg.HapticFeedback.selectionChanged();
+          break;
+        case 'rigid':
+          tg.HapticFeedback.impactOccurred('rigid');
+          break;
+        case 'medium':
+          tg.HapticFeedback.impactOccurred('medium');
+          break;
+        case 'heavy':
+          tg.HapticFeedback.impactOccurred('heavy');
+          break;
+        case 'success':
+          tg.HapticFeedback.notificationOccurred('success');
+          break;
+        case 'error':
+          tg.HapticFeedback.notificationOccurred('error');
+          break;
+        case 'light':
+        default:
+          tg.HapticFeedback.impactOccurred('light');
+          break;
+      }
     } else if (navigator.vibrate) {
-      navigator.vibrate(20);
+      if (type === 'success') navigator.vibrate([30, 40, 30]);
+      else if (type === 'heavy' || type === 'rigid') navigator.vibrate(35);
+      else if (type === 'medium') navigator.vibrate(20);
+      else navigator.vibrate(10);
     }
   }
 
@@ -132,7 +155,7 @@
       const targetTab = item.getAttribute('data-tab');
       if (!targetTab) return;
 
-      triggerHaptic('light');
+      triggerHaptic('selection');
 
       navItems.forEach(n => n.classList.remove('active'));
       tabViews.forEach(v => v.classList.remove('active'));
@@ -150,7 +173,7 @@
   filterPills.forEach(pill => {
     pill.addEventListener('click', () => {
       const filter = pill.getAttribute('data-filter');
-      triggerHaptic('light');
+      triggerHaptic('selection');
 
       filterPills.forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
@@ -197,7 +220,7 @@
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     hubForceInput.value = `${day}${month}`;
-    triggerHaptic('light');
+    triggerHaptic('rigid');
   });
 
   document.getElementById('hubPresetTimeBtn')?.addEventListener('click', () => {
@@ -205,12 +228,12 @@
     const hours = String(d.getHours()).padStart(2, '0');
     const mins = String(d.getMinutes()).padStart(2, '0');
     hubForceInput.value = `${hours}${mins}`;
-    triggerHaptic('light');
+    triggerHaptic('rigid');
   });
 
   document.getElementById('hubPresetPinBtn')?.addEventListener('click', () => {
     hubForceInput.value = '2580';
-    triggerHaptic('light');
+    triggerHaptic('rigid');
   });
 
   // Skin Switcher
@@ -234,7 +257,7 @@
         localStorage.setItem(`hub_skin_${roomId}`, skin);
         updateSkinUI(skin);
         saveConfigToServer(forceNumber, skin, mode);
-        triggerHaptic('light');
+        triggerHaptic('medium');
       }
     });
   });
