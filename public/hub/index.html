@@ -53,7 +53,7 @@
         <!-- COMPACT CHAMELEON CALCULATOR CARD -->
         <div class="glass-card trick-item-card" id="openCalcModalCard">
           <div class="trick-badge-row">
-            <span class="badge-active"><span class="pulse-dot"></span> ДОСТУП АКТИВЕН</span>
+            <span class="badge-active" id="calcStatusBadge"><span class="pulse-dot"></span> ДОСТУП АКТИВЕН</span>
             <span class="trick-price-tag">PRO • 45 USDT</span>
           </div>
 
@@ -73,8 +73,8 @@
               <span><i class="fa-solid fa-cube"></i> Samsung</span>
             </div>
             <button type="button" class="manage-trick-btn" id="openCalcModalBtn">
-              <span>Настроить</span>
-              <i class="fa-solid fa-sliders"></i>
+              <span id="openCalcBtnText">Настроить</span>
+              <i class="fa-solid fa-sliders" id="openCalcBtnIcon"></i>
             </button>
           </div>
         </div>
@@ -207,6 +207,86 @@
 
       </section>
 
+      <!-- =======================================================
+           TAB 4: АДМИН-ПАНЕЛЬ (ТОЛЬКО ДЛЯ SUPERADMIN)
+           ======================================================= -->
+      <section class="tab-view" id="view-admin">
+        <div class="section-title-wrap">
+          <span class="passport-tag">SUPERADMIN CONSOLE</span>
+          <h2 class="section-main-title">Управление доступом</h2>
+        </div>
+
+        <!-- Pending Orders Card -->
+        <div class="glass-card admin-card">
+          <div class="admin-card-header">
+            <div class="admin-header-title">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <h3>Заявки на оплату (<span id="adminPendingCount">0</span>)</h3>
+            </div>
+            <button class="save-field-btn" id="adminRefreshBtn" title="Обновить"><i class="fa-solid fa-rotate-right"></i></button>
+          </div>
+          <p class="admin-subtext">Пользователи, отправившие хеш транзакции (TXID) на 45 USDT.</p>
+          <div class="admin-list" id="adminPendingList">
+            <div class="admin-empty-state">Нет новых заявок</div>
+          </div>
+        </div>
+
+        <!-- Manual Access Grant Card -->
+        <div class="glass-card admin-card">
+          <div class="admin-card-header">
+            <div class="admin-header-title">
+              <i class="fa-solid fa-user-plus"></i>
+              <h3>Выдать доступ вручную</h3>
+            </div>
+          </div>
+          <p class="admin-subtext">Введите @username или Telegram ID пользователя для мгновенной активации.</p>
+          <div class="input-with-btn">
+            <input type="text" id="adminGrantInput" placeholder="@username или 123456789" autocomplete="off">
+            <button class="save-field-btn" id="adminGrantBtn">ВЫДАТЬ</button>
+          </div>
+        </div>
+
+        <!-- USDT Wallet Settings Card -->
+        <div class="glass-card admin-card">
+          <div class="admin-card-header">
+            <div class="admin-header-title">
+              <i class="fa-solid fa-wallet"></i>
+              <h3>Реквизиты для приема оплат (USDT)</h3>
+            </div>
+          </div>
+          <p class="admin-subtext">Эти адреса отображаются покупателям в окне оплаты.</p>
+          
+          <div class="field-box" style="margin-top: 10px;">
+            <label class="admin-label">USDT TRC-20 (Tron):</label>
+            <input type="text" class="admin-input-full" id="adminWalletTrc20" placeholder="TXxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+          </div>
+
+          <div class="field-box" style="margin-top: 10px;">
+            <label class="admin-label">USDT TON (Jetton):</label>
+            <input type="text" class="admin-input-full" id="adminWalletTon" placeholder="EQxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+          </div>
+
+          <button class="primary-action-btn" id="adminSaveWalletBtn" style="margin-top: 12px;">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Сохранить реквизиты</span>
+          </button>
+        </div>
+
+        <!-- Whitelist of Active Users -->
+        <div class="glass-card admin-card">
+          <div class="admin-card-header">
+            <div class="admin-header-title">
+              <i class="fa-solid fa-users-viewfinder"></i>
+              <h3>Активные лицензии (<span id="adminWhitelistCount">0</span>)</h3>
+            </div>
+          </div>
+          <div class="admin-list" id="adminWhitelistList">
+            <div class="admin-empty-state">Список пуст</div>
+          </div>
+        </div>
+
+      </section>
+
     </main>
 
     <!-- FLOATING FROSTED GLASS CAPSULE (BOTTOM NAVIGATION) -->
@@ -234,6 +314,14 @@
             <span class="nav-pulse-dot"></span>
           </div>
           <span class="nav-label">КАБИНЕТ</span>
+        </button>
+
+        <button class="nav-item" data-tab="admin" id="navAdminBtn" style="display: none;">
+          <div class="nav-icon-box">
+            <i class="fa-solid fa-crown"></i>
+            <span class="nav-pulse-dot"></span>
+          </div>
+          <span class="nav-label">АДМИН</span>
         </button>
       </div>
     </nav>
@@ -365,7 +453,60 @@
       </div>
     </div>
 
-    <!-- CHECKOUT MODAL (SMOKED GLASS) -->
+    <!-- =========================================================
+         BUY ACCESS MODAL (USDT PAYMENT BOTTOM SHEET)
+         ========================================================= -->
+    <div class="pwa-modal-backdrop" id="buyAccessModal">
+      <div class="pwa-modal-content calc-modal-content">
+        <div class="pwa-modal-header">
+          <div>
+            <span class="passport-tag">ПОЖИЗНЕННАЯ ЛИЦЕНЗИЯ</span>
+            <h3>Доступ к Chameleon Calculator</h3>
+          </div>
+          <button class="close-modal-btn" id="closeBuyModalBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="calc-modal-scroll">
+          <div class="buy-price-banner">
+            <div class="buy-price-val">45 USDT</div>
+            <div class="buy-price-desc">Бессрочный доступ ко всем 5 режимам + обновления + Stealth Console</div>
+          </div>
+
+          <div class="buy-step-box">
+            <div class="buy-step-title"><span class="step-badge">1</span> Переведите ровно 45 USDT на один из кошельков:</div>
+            
+            <!-- TRC20 -->
+            <div class="wallet-copy-box">
+              <div class="wallet-copy-header">
+                <span class="wallet-net-tag">USDT TRC-20 (Tron)</span>
+                <button class="wallet-copy-btn" id="copyTrc20Btn"><i class="fa-solid fa-copy"></i> Копия</button>
+              </div>
+              <div class="wallet-address-text" id="displayTrc20Address">Загрузка адреса...</div>
+            </div>
+
+            <!-- TON -->
+            <div class="wallet-copy-box" style="margin-top: 10px;">
+              <div class="wallet-copy-header">
+                <span class="wallet-net-tag">USDT TON (Jetton)</span>
+                <button class="wallet-copy-btn" id="copyTonBtn"><i class="fa-solid fa-copy"></i> Копия</button>
+              </div>
+              <div class="wallet-address-text" id="displayTonAddress">Загрузка адреса...</div>
+            </div>
+          </div>
+
+          <div class="buy-step-box" style="margin-top: 14px;">
+            <div class="buy-step-title"><span class="step-badge">2</span> Вставьте хеш транзакции (TXID):</div>
+            <p class="buy-step-hint">После перевода скопируйте TXID (хеш транзакции) из кошелька и отправьте на проверку:</p>
+            <div class="input-with-btn">
+              <input type="text" id="buyTxidInput" placeholder="Вставьте TXID / хеш транзакции..." autocomplete="off">
+              <button class="save-field-btn" id="submitBuyRequestBtn">ОТПРАВИТЬ</button>
+            </div>
+            <div class="buy-status-info" id="buyStatusInfo" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- STRICT TOAST NOTIFICATION -->
     <div class="toast-capsule" id="toastCapsule">
       <i class="fa-solid fa-circle-check toast-icon" id="toastIcon"></i>

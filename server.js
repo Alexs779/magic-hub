@@ -82,8 +82,114 @@ app.post('/api/user/config', (req, res) => {
   });
 });
 
+const accessManager = require('./lib/access-manager');
+
 app.get('/hub', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'hub', 'index.html'));
+});
+
+// --- ACCESS & ADMIN REST API ---
+app.get('/api/access/check', (req, res) => {
+  const { userId, username } = req.query || {};
+  const isAdmin = accessManager.isAdmin(userId);
+  const hasAccess = isAdmin || accessManager.hasAccess(userId, username);
+  const pending = accessManager.getPendingRequest(userId);
+  const data = accessManager.loadAccessData();
+
+  res.json({
+    userId,
+    username,
+    isAdmin,
+    hasAccess,
+    pending: !!pending,
+    pendingDetails: pending,
+    wallet: data.wallet
+  });
+});
+
+app.post('/api/access/buy-request', (req, res) => {
+  const { userId, username, txHash, network } = req.body || {};
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+  try {
+    const request = accessManager.createBuyRequest({ userId, username, txHash, network });
+    res.json({ success: true, request });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Admin endpoints
+app.get('/api/admin/overview', (req, res) => {
+  const adminId = req.query.adminId;
+  if (!accessManager.isAdmin(adminId)) {
+    return res.status(403).json({ error: 'Forbidden: not an admin' });
+  }
+  res.json(accessManager.getOverview(adminId));
+});
+
+app.post('/api/admin/approve', (req, res) => {
+  const { adminId, targetUserId } = req.body || {};
+  if (!accessManager.isAdmin(adminId)) {
+    return res.status(403).json({ error: 'Forbidden: not an admin' });
+  }
+  try {
+    const result = accessManager.approveRequest(adminId, targetUserId);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/admin/reject', (req, res) => {
+  const { adminId, targetUserId } = req.body || {};
+  if (!accessManager.isAdmin(adminId)) {
+    return res.status(403).json({ error: 'Forbidden: not an admin' });
+  }
+  try {
+    const result = accessManager.rejectRequest(adminId, targetUserId);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/admin/grant', (req, res) => {
+  const { adminId, identifier } = req.body || {};
+  if (!accessManager.isAdmin(adminId)) {
+    return res.status(403).json({ error: 'Forbidden: not an admin' });
+  }
+  try {
+    const result = accessManager.grantAccess(adminId, identifier);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/admin/revoke', (req, res) => {
+  const { adminId, identifier } = req.body || {};
+  if (!accessManager.isAdmin(adminId)) {
+    return res.status(403).json({ error: 'Forbidden: not an admin' });
+  }
+  try {
+    const result = accessManager.revokeAccess(adminId, identifier);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/admin/wallet', (req, res) => {
+  const { adminId, trc20, ton } = req.body || {};
+  if (!accessManager.isAdmin(adminId)) {
+    return res.status(403).json({ error: 'Forbidden: not an admin' });
+  }
+  try {
+    const wallet = accessManager.updateWallet(adminId, { trc20, ton });
+    res.json({ success: true, wallet });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // WebSocket realtime synchronization

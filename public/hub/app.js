@@ -358,6 +358,38 @@
     }
   });
 
+  // --- ACCESS CONTROL & ADMIN STATE ---
+  let isUserAdmin = false;
+  let userHasAccess = false;
+  let isPending = false;
+  let pendingDetails = null;
+  let walletConfig = { trc20: '', ton: '' };
+
+  const buyAccessModal = document.getElementById('buyAccessModal');
+  const closeBuyModalBtn = document.getElementById('closeBuyModalBtn');
+  const calcStatusBadge = document.getElementById('calcStatusBadge');
+  const openCalcBtnText = document.getElementById('openCalcBtnText');
+  const openCalcBtnIcon = document.getElementById('openCalcBtnIcon');
+  const displayTrc20Address = document.getElementById('displayTrc20Address');
+  const displayTonAddress = document.getElementById('displayTonAddress');
+  const copyTrc20Btn = document.getElementById('copyTrc20Btn');
+  const copyTonBtn = document.getElementById('copyTonBtn');
+  const buyTxidInput = document.getElementById('buyTxidInput');
+  const submitBuyRequestBtn = document.getElementById('submitBuyRequestBtn');
+  const buyStatusInfo = document.getElementById('buyStatusInfo');
+
+  const navAdminBtn = document.getElementById('navAdminBtn');
+  const adminPendingCount = document.getElementById('adminPendingCount');
+  const adminPendingList = document.getElementById('adminPendingList');
+  const adminRefreshBtn = document.getElementById('adminRefreshBtn');
+  const adminGrantInput = document.getElementById('adminGrantInput');
+  const adminGrantBtn = document.getElementById('adminGrantBtn');
+  const adminWalletTrc20 = document.getElementById('adminWalletTrc20');
+  const adminWalletTon = document.getElementById('adminWalletTon');
+  const adminSaveWalletBtn = document.getElementById('adminSaveWalletBtn');
+  const adminWhitelistCount = document.getElementById('adminWhitelistCount');
+  const adminWhitelistList = document.getElementById('adminWhitelistList');
+
   // --- TELEGRAM BACK BUTTON & MODAL CONTROLLER ---
   const pwaModal = document.getElementById('pwaModal');
   const calcModal = document.getElementById('calcSettingsModal');
@@ -367,7 +399,9 @@
 
   function updateTgBackButton() {
     if (!tg?.BackButton) return;
-    const anyModalOpen = pwaModal?.classList.contains('active') || calcModal?.classList.contains('active');
+    const anyModalOpen = pwaModal?.classList.contains('active') || 
+                         calcModal?.classList.contains('active') ||
+                         buyAccessModal?.classList.contains('active');
     if (anyModalOpen) {
       tg.BackButton.show();
       tg.BackButton.onClick(closeAllModals);
@@ -379,8 +413,27 @@
   function closeAllModals() {
     pwaModal?.classList.remove('active');
     calcModal?.classList.remove('active');
+    buyAccessModal?.classList.remove('active');
     updateTgBackButton();
   }
+
+  // --- BUY ACCESS MODAL ---
+  function openBuyModal() {
+    triggerHaptic('medium');
+    buyAccessModal?.classList.add('active');
+    updateTgBackButton();
+  }
+
+  function closeBuyModal() {
+    triggerHaptic('light');
+    buyAccessModal?.classList.remove('active');
+    updateTgBackButton();
+  }
+
+  closeBuyModalBtn?.addEventListener('click', closeBuyModal);
+  buyAccessModal?.addEventListener('click', (e) => {
+    if (e.target === buyAccessModal) closeBuyModal();
+  });
 
   // --- CHAMELEON CALCULATOR MODAL ---
   function openCalcSettings() {
@@ -397,11 +450,19 @@
 
   openCalcModalBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
-    openCalcSettings();
+    if (userHasAccess) {
+      openCalcSettings();
+    } else {
+      openBuyModal();
+    }
   });
 
   openCalcModalCard?.addEventListener('click', () => {
-    openCalcSettings();
+    if (userHasAccess) {
+      openCalcSettings();
+    } else {
+      openBuyModal();
+    }
   });
 
   closeCalcModalBtn?.addEventListener('click', () => {
@@ -433,4 +494,336 @@
     }
   });
 
+  // --- ACCESS VERIFICATION ENGINE ---
+  async function checkAccess() {
+    try {
+      const res = await fetch(`/api/access/check?userId=${encodeURIComponent(userId)}&username=${encodeURIComponent(userTagStr)}`);
+      if (res.ok) {
+        const data = await res.json();
+        isUserAdmin = !!data.isAdmin;
+        userHasAccess = !!data.hasAccess;
+        isPending = !!data.pending;
+        pendingDetails = data.pendingDetails || null;
+        if (data.wallet) walletConfig = data.wallet;
+
+        updateAccessUI();
+
+        if (isUserAdmin) {
+          if (navAdminBtn) navAdminBtn.style.display = 'flex';
+          loadAdminOverview();
+        }
+      }
+    } catch (e) {
+      console.warn('Access check offline:', e);
+    }
+  }
+
+  function updateAccessUI() {
+    // Update wallet addresses in modal
+    if (displayTrc20Address) displayTrc20Address.textContent = walletConfig.trc20 || 'Адрес TRC-20 не задан';
+    if (displayTonAddress) displayTonAddress.textContent = walletConfig.ton || 'Адрес TON не задан';
+
+    if (userHasAccess) {
+      if (calcStatusBadge) {
+        calcStatusBadge.className = 'badge-active';
+        calcStatusBadge.innerHTML = '<span class="pulse-dot"></span> ДОСТУП АКТИВЕН';
+      }
+      if (openCalcBtnText) openCalcBtnText.textContent = 'Настроить';
+      if (openCalcBtnIcon) openCalcBtnIcon.className = 'fa-solid fa-sliders';
+    } else if (isPending) {
+      if (calcStatusBadge) {
+        calcStatusBadge.className = 'badge-pending';
+        calcStatusBadge.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> ПРОВЕРКА ОПЛАТЫ';
+      }
+      if (openCalcBtnText) openCalcBtnText.textContent = 'Статус заявки';
+      if (openCalcBtnIcon) openCalcBtnIcon.className = 'fa-solid fa-clock';
+      if (buyStatusInfo) {
+        buyStatusInfo.style.display = 'flex';
+        buyStatusInfo.innerHTML = '<i class="fa-solid fa-clock"></i> <span>Заявка отправлена администратору. Доступ активируется после проверки TXID.</span>';
+      }
+    } else {
+      if (calcStatusBadge) {
+        calcStatusBadge.className = 'badge-locked';
+        calcStatusBadge.innerHTML = '<i class="fa-solid fa-lock"></i> ДОСТУП ЗАКРЫТ • 45 USDT';
+      }
+      if (openCalcBtnText) openCalcBtnText.textContent = 'Купить доступ (45 USDT)';
+      if (openCalcBtnIcon) openCalcBtnIcon.className = 'fa-solid fa-lock';
+      if (buyStatusInfo) {
+        buyStatusInfo.style.display = 'none';
+      }
+    }
+  }
+
+  // Copy wallet buttons in buy modal
+  copyTrc20Btn?.addEventListener('click', async () => {
+    if (walletConfig.trc20) {
+      try {
+        await navigator.clipboard.writeText(walletConfig.trc20);
+        triggerHaptic('success');
+        showToast('Адрес USDT TRC-20 скопирован');
+      } catch (e) {
+        prompt('Скопируйте адрес:', walletConfig.trc20);
+      }
+    }
+  });
+
+  copyTonBtn?.addEventListener('click', async () => {
+    if (walletConfig.ton) {
+      try {
+        await navigator.clipboard.writeText(walletConfig.ton);
+        triggerHaptic('success');
+        showToast('Адрес USDT TON скопирован');
+      } catch (e) {
+        prompt('Скопируйте адрес:', walletConfig.ton);
+      }
+    }
+  });
+
+  // Submit TXID buy request
+  submitBuyRequestBtn?.addEventListener('click', async () => {
+    const txHash = buyTxidInput?.value.trim();
+    if (!txHash) {
+      triggerHaptic('error');
+      showToast('Введите TXID транзакции', 'error');
+      return;
+    }
+    submitBuyRequestBtn.disabled = true;
+    submitBuyRequestBtn.textContent = '...';
+    try {
+      const res = await fetch('/api/access/buy-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          username: userTagStr,
+          txHash,
+          network: 'USDT'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        triggerHaptic('success');
+        showToast('Заявка успешно отправлена!');
+        isPending = true;
+        updateAccessUI();
+        closeBuyModal();
+      } else {
+        throw new Error(data.error || 'Ошибка отправки');
+      }
+    } catch (err) {
+      triggerHaptic('error');
+      showToast(err.message, 'error');
+    } finally {
+      submitBuyRequestBtn.disabled = false;
+      submitBuyRequestBtn.textContent = 'ОТПРАВИТЬ';
+    }
+  });
+
+  // --- ADMIN CONSOLE LOGIC ---
+  async function loadAdminOverview() {
+    if (!isUserAdmin) return;
+    try {
+      const res = await fetch(`/api/admin/overview?adminId=${encodeURIComponent(userId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        renderAdminOverview(data);
+      }
+    } catch (e) {
+      console.warn('Admin overview fetch error:', e);
+    }
+  }
+
+  function renderAdminOverview(data) {
+    // 1. Pending List
+    const pending = data.pending || [];
+    if (adminPendingCount) adminPendingCount.textContent = pending.length;
+    if (adminPendingList) {
+      if (pending.length === 0) {
+        adminPendingList.innerHTML = '<div class="admin-empty-state">Нет новых заявок</div>';
+      } else {
+        adminPendingList.innerHTML = pending.map(item => `
+          <div class="admin-pending-item">
+            <div class="admin-pending-header">
+              <div class="admin-pending-user">
+                <span class="admin-pending-name">${item.username ? '@' + item.username : 'User ' + item.userId}</span>
+                <span class="admin-pending-id">ID: ${item.userId}</span>
+              </div>
+              <span class="admin-pending-badge">${item.network || 'USDT'} • 45 USDT</span>
+            </div>
+            <div class="admin-pending-txid-box">
+              <span class="admin-pending-txid-label">TXID:</span>
+              <span class="admin-pending-txid-val">${item.txHash}</span>
+            </div>
+            <div class="admin-actions-row">
+              <button class="admin-action-btn admin-approve-btn" data-user="${item.userId}">
+                <i class="fa-solid fa-check"></i> Одобрить
+              </button>
+              <button class="admin-action-btn admin-reject-btn" data-user="${item.userId}">
+                <i class="fa-solid fa-xmark"></i> Отклонить
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        adminPendingList.querySelectorAll('.admin-approve-btn').forEach(btn => {
+          btn.addEventListener('click', () => approveUser(btn.getAttribute('data-user')));
+        });
+        adminPendingList.querySelectorAll('.admin-reject-btn').forEach(btn => {
+          btn.addEventListener('click', () => rejectUser(btn.getAttribute('data-user')));
+        });
+      }
+    }
+
+    // 2. Wallets
+    if (data.wallet) {
+      if (adminWalletTrc20 && !adminWalletTrc20.value) adminWalletTrc20.value = data.wallet.trc20 || '';
+      if (adminWalletTon && !adminWalletTon.value) adminWalletTon.value = data.wallet.ton || '';
+    }
+
+    // 3. Whitelist
+    const whitelist = data.whitelist || [];
+    if (adminWhitelistCount) adminWhitelistCount.textContent = whitelist.length;
+    if (adminWhitelistList) {
+      if (whitelist.length === 0) {
+        adminWhitelistList.innerHTML = '<div class="admin-empty-state">Список пуст</div>';
+      } else {
+        adminWhitelistList.innerHTML = whitelist.map(id => `
+          <div class="admin-whitelist-item">
+            <span class="admin-whitelist-user">
+              <i class="fa-solid fa-user-check"></i> ${id}
+            </span>
+            ${id === '7357950968' ? '<span class="admin-pending-badge">SUPERADMIN</span>' : `
+              <button class="admin-revoke-btn" data-id="${id}">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            `}
+          </div>
+        `).join('');
+
+        adminWhitelistList.querySelectorAll('.admin-revoke-btn').forEach(btn => {
+          btn.addEventListener('click', () => revokeUser(btn.getAttribute('data-id')));
+        });
+      }
+    }
+  }
+
+  async function approveUser(targetUserId) {
+    triggerHaptic('rigid');
+    try {
+      const res = await fetch('/api/admin/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminId: userId, targetUserId })
+      });
+      const d = await res.json();
+      if (d.success) {
+        triggerHaptic('success');
+        showToast(`Доступ одобрен: ${targetUserId}`);
+        loadAdminOverview();
+      }
+    } catch (e) {
+      showToast('Ошибка одобрения', 'error');
+    }
+  }
+
+  async function rejectUser(targetUserId) {
+    triggerHaptic('light');
+    try {
+      const res = await fetch('/api/admin/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminId: userId, targetUserId })
+      });
+      const d = await res.json();
+      if (d.success) {
+        showToast(`Заявка отклонена: ${targetUserId}`);
+        loadAdminOverview();
+      }
+    } catch (e) {
+      showToast('Ошибка отклонения', 'error');
+    }
+  }
+
+  async function revokeUser(identifier) {
+    if (!confirm(`Отозвать доступ у ${identifier}?`)) return;
+    triggerHaptic('rigid');
+    try {
+      const res = await fetch('/api/admin/revoke', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminId: userId, identifier })
+      });
+      const d = await res.json();
+      if (d.success) {
+        triggerHaptic('success');
+        showToast(`Доступ отозван: ${identifier}`);
+        loadAdminOverview();
+      }
+    } catch (e) {
+      showToast('Ошибка отзыва', 'error');
+    }
+  }
+
+  // Admin refresh button
+  adminRefreshBtn?.addEventListener('click', () => {
+    triggerHaptic('light');
+    loadAdminOverview();
+    showToast('Данные обновлены');
+  });
+
+  // Admin manual grant button
+  adminGrantBtn?.addEventListener('click', async () => {
+    const val = adminGrantInput?.value.trim();
+    if (!val) {
+      showToast('Введите @username или ID', 'error');
+      return;
+    }
+    triggerHaptic('rigid');
+    try {
+      const res = await fetch('/api/admin/grant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminId: userId, identifier: val })
+      });
+      const d = await res.json();
+      if (d.success) {
+        triggerHaptic('success');
+        showToast(`Доступ выдан: ${val}`);
+        if (adminGrantInput) adminGrantInput.value = '';
+        loadAdminOverview();
+      } else {
+        throw new Error(d.error || 'Ошибка');
+      }
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  });
+
+  // Admin save wallet button
+  adminSaveWalletBtn?.addEventListener('click', async () => {
+    const trc20 = adminWalletTrc20?.value.trim() || '';
+    const ton = adminWalletTon?.value.trim() || '';
+    triggerHaptic('rigid');
+    try {
+      const res = await fetch('/api/admin/wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminId: userId, trc20, ton })
+      });
+      const d = await res.json();
+      if (d.success) {
+        triggerHaptic('success');
+        showToast('Реквизиты сохранены');
+        walletConfig = d.wallet;
+        updateAccessUI();
+      }
+    } catch (e) {
+      showToast('Ошибка сохранения реквизитов', 'error');
+    }
+  });
+
+  // Initial access check
+  checkAccess();
+
 })();
+
