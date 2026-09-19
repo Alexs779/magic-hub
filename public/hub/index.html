@@ -45,102 +45,37 @@
            ======================================================= -->
       <section class="tab-view active" id="view-tricks">
         
-        <!-- CHAMELEON CALCULATOR (ФЛАГМАНСКИЙ ФОКУС) -->
-        <div class="glass-card trick-card trick-card-owned" data-trick="calculator">
+        <div class="section-title-wrap">
+          <span class="passport-tag">РЕПЕРТУАР МЕНТАЛИСТА</span>
+          <h2 class="section-main-title">Мои фокусы</h2>
+        </div>
+
+        <!-- COMPACT CHAMELEON CALCULATOR CARD -->
+        <div class="glass-card trick-item-card" id="openCalcModalCard">
           <div class="trick-badge-row">
             <span class="badge-active"><span class="pulse-dot"></span> ДОСТУП АКТИВЕН</span>
-            <span class="trick-price-tag">45 USDT</span>
+            <span class="trick-price-tag">PRO • 45 USDT</span>
           </div>
 
-          <div class="trick-header">
+          <div class="compact-trick-header">
+            <div class="trick-glyph"><i class="fa-solid fa-calculator"></i></div>
             <div class="trick-title-wrap">
               <h2>Chameleon Calculator</h2>
-              <span class="trick-subtitle">Эффект: «Звонок в будущее» + Взлом PIN-кода</span>
+              <span class="trick-subtitle">«Звонок в будущее» • Взлом PIN-кода</span>
             </div>
-            <div class="trick-glyph"><i class="fa-solid fa-calculator"></i></div>
+            <div class="trick-chevron"><i class="fa-solid fa-chevron-right"></i></div>
           </div>
 
-          <!-- Video / Effect Teaser Accordion -->
-          <div class="effect-teaser-box">
-            <div class="teaser-header">
-              <i class="fa-solid fa-play"></i>
-              <strong>ЧТО ВИДИТ ЗРИТЕЛЬ:</strong>
+          <div class="trick-card-footer">
+            <div class="trick-footer-meta">
+              <span><i class="fa-brands fa-apple"></i> iOS 18</span>
+              <span><i class="fa-brands fa-android"></i> Pixel</span>
+              <span><i class="fa-solid fa-cube"></i> Samsung</span>
             </div>
-            <p>Зритель перемножает любые случайные числа на калькуляторе. В финале получается номер телефона. Зритель звонит по нему — и телефон звенит в вашем кармане, у босса на сцене или на телефоне самого зрителя!</p>
-          </div>
-
-          <!-- Quick Control Panel (Unlocked) -->
-          <div class="unlocked-panel">
-            <div class="panel-section-title">
+            <button type="button" class="manage-trick-btn" id="openCalcModalBtn">
+              <span>Настроить</span>
               <i class="fa-solid fa-sliders"></i>
-              <span>ПАНЕЛЬ НАСТРОЙКИ ФОКУСА</span>
-            </div>
-
-            <!-- Target Phone Number -->
-            <div class="field-box">
-              <div class="field-header">
-                <label>ФОРСИРОВАННЫЙ НОМЕР ДЛЯ ЗВОНКА (=)</label>
-              </div>
-              <div class="input-with-btn">
-                <input type="tel" id="hubForceInput" placeholder="79163428812" autocomplete="off">
-                <button class="save-field-btn" id="hubSaveForceBtn">OK</button>
-              </div>
-              <div class="quick-presets-row">
-                <button type="button" class="chip-btn" id="hubPresetDateBtn">ДАТА</button>
-                <button type="button" class="chip-btn" id="hubPresetTimeBtn">ВРЕМЯ</button>
-                <button type="button" class="chip-btn" id="hubPresetPinBtn">PIN 2580</button>
-              </div>
-            </div>
-
-            <!-- Skin Camouflage Selector -->
-            <div class="field-box">
-              <div class="field-header">
-                <label>КАМУФЛЯЖ ПОД ТЕЛЕФОН ЗРИТЕЛЯ</label>
-              </div>
-              <div class="skin-selector-grid">
-                <button type="button" class="skin-opt-btn active" data-skin="ios">
-                  <i class="fa-brands fa-apple"></i>
-                  <span>Apple iOS 18</span>
-                </button>
-                <button type="button" class="skin-opt-btn" data-skin="android">
-                  <i class="fa-brands fa-android"></i>
-                  <span>Pixel</span>
-                </button>
-                <button type="button" class="skin-opt-btn" data-skin="samsung">
-                  <i class="fa-solid fa-cube"></i>
-                  <span>Samsung</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Primary Action Buttons -->
-            <div class="action-buttons-stack">
-              <button class="primary-action-btn" id="hubCopySpectatorBtn">
-                <i class="fa-solid fa-copy"></i>
-                <span>Скопировать ссылку на Калькулятор (для ярлыка PWA)</span>
-              </button>
-              
-              <div class="split-buttons-row">
-                <button class="secondary-action-btn" id="hubOpenCalcBtn">
-                  <i class="fa-regular fa-clone"></i> Запустить
-                </button>
-                <button class="secondary-action-btn" id="hubOpenPeekBtn">
-                  <i class="fa-solid fa-eye-slash"></i> Stealth Console
-                </button>
-              </div>
-            </div>
-
-            <!-- PWA Guide Banner -->
-            <div class="pwa-guide-strip" id="openPwaGuideModalBtn">
-              <div class="strip-left">
-                <i class="fa-solid fa-mobile-screen-button"></i>
-                <div>
-                  <strong>Как добавить значок на экран Домой</strong>
-                  <p>Работает на весь экран без рамок браузера и без интернета</p>
-                </div>
-              </div>
-              <i class="fa-solid fa-chevron-right strip-arrow"></i>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -282,6 +217,98 @@
       </div>
     </nav>
 
+    <!-- =========================================================
+         CHAMELEON CALCULATOR SETTINGS MODAL (BOTTOM SHEET)
+         ========================================================= -->
+    <div class="pwa-modal-backdrop" id="calcSettingsModal">
+      <div class="pwa-modal-content calc-modal-content">
+        <div class="pwa-modal-header">
+          <div>
+            <span class="passport-tag">УПРАВЛЕНИЕ ФОКУСОМ</span>
+            <h3>Chameleon Calculator</h3>
+          </div>
+          <button class="close-modal-btn" id="closeCalcModalBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="calc-modal-scroll">
+          <!-- Video / Effect Teaser Box -->
+          <div class="effect-teaser-box">
+            <div class="teaser-header">
+              <i class="fa-solid fa-play"></i>
+              <strong>СУТЬ ЭФФЕКТА:</strong>
+            </div>
+            <p>Зритель перемножает любые случайные числа на калькуляторе. В финале получается номер телефона. Зритель звонит по нему — и телефон звенит в вашем кармане, у босса на сцене или на телефоне самого зрителя!</p>
+          </div>
+
+          <!-- Target Phone Number -->
+          <div class="field-box">
+            <div class="field-header">
+              <label>ФОРСИРОВАННЫЙ НОМЕР ДЛЯ ЗВОНКА (=)</label>
+            </div>
+            <div class="input-with-btn">
+              <input type="tel" id="hubForceInput" placeholder="79163428812" autocomplete="off">
+              <button class="save-field-btn" id="hubSaveForceBtn">OK</button>
+            </div>
+            <div class="quick-presets-row">
+              <button type="button" class="chip-btn" id="hubPresetDateBtn">ДАТА</button>
+              <button type="button" class="chip-btn" id="hubPresetTimeBtn">ВРЕМЯ</button>
+              <button type="button" class="chip-btn" id="hubPresetPinBtn">PIN 2580</button>
+            </div>
+          </div>
+
+          <!-- Skin Camouflage Selector -->
+          <div class="field-box">
+            <div class="field-header">
+              <label>КАМУФЛЯЖ ПОД ТЕЛЕФОН ЗРИТЕЛЯ</label>
+            </div>
+            <div class="skin-selector-grid">
+              <button type="button" class="skin-opt-btn active" data-skin="ios">
+                <i class="fa-brands fa-apple"></i>
+                <span>Apple iOS 18</span>
+              </button>
+              <button type="button" class="skin-opt-btn" data-skin="android">
+                <i class="fa-brands fa-android"></i>
+                <span>Pixel</span>
+              </button>
+              <button type="button" class="skin-opt-btn" data-skin="samsung">
+                <i class="fa-solid fa-cube"></i>
+                <span>Samsung</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Primary Action Buttons -->
+          <div class="action-buttons-stack">
+            <button class="primary-action-btn" id="hubCopySpectatorBtn">
+              <i class="fa-solid fa-copy"></i>
+              <span>Скопировать ссылку на Калькулятор</span>
+            </button>
+            
+            <div class="split-buttons-row">
+              <button class="secondary-action-btn" id="hubOpenCalcBtn">
+                <i class="fa-regular fa-clone"></i> Запустить
+              </button>
+              <button class="secondary-action-btn" id="hubOpenPeekBtn">
+                <i class="fa-solid fa-eye-slash"></i> Stealth Console
+              </button>
+            </div>
+          </div>
+
+          <!-- PWA Guide Banner -->
+          <div class="pwa-guide-strip" id="openPwaGuideModalBtn">
+            <div class="strip-left">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <div>
+                <strong>Как добавить значок на экран Домой</strong>
+                <p>Работает на весь экран без рамок браузера и без интернета</p>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right strip-arrow"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- PWA GUIDE MODAL -->
     <div class="pwa-modal-backdrop" id="pwaModal">
       <div class="pwa-modal-content">
@@ -311,7 +338,6 @@
             <i class="fa-solid fa-lock"></i>
             <span>После этого калькулятор запускается на весь экран без адресной строки браузера и работает 100% автономно даже БЕЗ ИНТЕРНЕТА.</span>
           </div>
-        </div>
         </div>
       </div>
     </div>

@@ -305,10 +305,14 @@
 
   // --- TELEGRAM BACK BUTTON & MODAL CONTROLLER ---
   const pwaModal = document.getElementById('pwaModal');
+  const calcModal = document.getElementById('calcSettingsModal');
+  const openCalcModalCard = document.getElementById('openCalcModalCard');
+  const openCalcModalBtn = document.getElementById('openCalcModalBtn');
+  const closeCalcModalBtn = document.getElementById('closeCalcModalBtn');
 
   function updateTgBackButton() {
     if (!tg?.BackButton) return;
-    const anyModalOpen = pwaModal?.classList.contains('active');
+    const anyModalOpen = pwaModal?.classList.contains('active') || calcModal?.classList.contains('active');
     if (anyModalOpen) {
       tg.BackButton.show();
       tg.BackButton.onClick(closeAllModals);
@@ -319,8 +323,41 @@
 
   function closeAllModals() {
     pwaModal?.classList.remove('active');
+    calcModal?.classList.remove('active');
     updateTgBackButton();
   }
+
+  // --- CHAMELEON CALCULATOR MODAL ---
+  function openCalcSettings() {
+    triggerHaptic('medium');
+    calcModal?.classList.add('active');
+    updateTgBackButton();
+  }
+
+  function closeCalcSettings() {
+    triggerHaptic('light');
+    calcModal?.classList.remove('active');
+    updateTgBackButton();
+  }
+
+  openCalcModalBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCalcSettings();
+  });
+
+  openCalcModalCard?.addEventListener('click', () => {
+    openCalcSettings();
+  });
+
+  closeCalcModalBtn?.addEventListener('click', () => {
+    closeCalcSettings();
+  });
+
+  calcModal?.addEventListener('click', (e) => {
+    if (e.target === calcModal) {
+      closeCalcSettings();
+    }
+  });
 
   // --- PWA GUIDE MODAL ---
   document.getElementById('openPwaGuideModalBtn')?.addEventListener('click', () => {

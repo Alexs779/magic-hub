@@ -229,11 +229,109 @@ body {
   box-shadow: 0 0 16px rgba(168, 85, 247, 0.25), var(--glass-highlight);
 }
 
+.section-title-wrap {
+  margin-bottom: 16px;
+}
+
+.section-main-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin-top: 4px;
+}
+
 /* =========================================================
-   TRICK CARDS (HUB & STORE)
+   COMPACT TRICK CARDS (HUB)
    ========================================================= */
-.trick-card {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+.trick-item-card {
+  cursor: pointer;
+  transition: transform 0.12s cubic-bezier(0.2, 0.9, 0.3, 1.2), border-color 0.2s, box-shadow 0.2s;
+}
+
+.trick-item-card:active {
+  transform: scale(0.98);
+  border-color: var(--cosmic-purple);
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.25);
+}
+
+.compact-trick-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.compact-trick-header .trick-glyph {
+  flex-shrink: 0;
+}
+
+.compact-trick-header .trick-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-trick-header .trick-title-wrap h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.trick-chevron {
+  color: var(--text-faint);
+  font-size: 1rem;
+  margin-left: 6px;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.trick-item-card:hover .trick-chevron,
+.trick-item-card:active .trick-chevron {
+  transform: translateX(3px);
+  color: var(--cosmic-light);
+}
+
+.trick-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 14px;
+  margin-top: 14px;
+}
+
+.trick-footer-meta {
+  display: flex;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.trick-footer-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.manage-trick-btn {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid var(--glass-border-bright);
+  color: var(--text-platinum);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.manage-trick-btn:active {
+  background: var(--primary-gradient);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
 }
 
 .trick-badge-row {
@@ -1009,6 +1107,33 @@ body {
   max-width: 480px;
   padding: 26px 22px calc(26px + var(--safe-bottom)) 22px;
   animation: strictSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calc-modal-content {
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(14, 10, 26, 0.96);
+  border-top: 1px solid var(--glass-border-bright);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(168, 85, 247, 0.15);
+}
+
+.calc-modal-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(20px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.calc-modal-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.calc-modal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.3);
+  border-radius: 4px;
 }
 
 @keyframes strictSlideUp {
