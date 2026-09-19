@@ -67,57 +67,32 @@
 
     <!-- CONFIGURATION & CONTROLS -->
     <section class="controls-area">
-      <!-- Target Force Setup -->
+      <!-- 1-Touch Mode Switcher -->
+      <div class="mode-switch-grid" style="grid-template-columns: 1fr 1fr;">
+        <button class="mode-btn active" id="modeToxicBtn">⚡ ФОРС (TOXIC)</button>
+        <button class="mode-btn" id="modePanicBtn">🟢 ЧИСТЫЙ (ОБЫЧНЫЙ)</button>
+      </div>
+
+      <!-- Super 5 Quick Presets Card -->
       <div class="control-card">
         <div class="card-header">
-          <span>ЦЕЛЕВОЕ ЧИСЛО (TOXIC FORCE)</span>
-          <span class="mode-badge" id="modeBadge">TOXIC АКТИВЕН</span>
+          <span>СЦЕНАРИИ 5-В-1 (БЫСТРАЯ ЦЕЛЬ)</span>
+          <span class="mode-badge" id="modeBadge">ФОРС АКТИВЕН</span>
         </div>
-        
+
+        <div class="preset-buttons" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 12px;">
+          <button class="preset-btn" id="presetPhoneBtn">📞 Телефон</button>
+          <button class="preset-btn" id="presetDateBtn">📅 Дата</button>
+          <button class="preset-btn" id="presetTimeBtn">⏰ Время</button>
+          <button class="preset-btn" id="presetPinBtn">🔑 PIN 2580</button>
+          <button class="preset-btn" id="presetBookBtn">📖 Книга 147</button>
+          <button class="preset-btn" id="presetCleanBtn">🛡️ Сброс</button>
+        </div>
+
+        <!-- Custom Target Force Number -->
         <div class="input-row">
-          <input type="text" id="targetForceInput" placeholder="79163428812">
+          <input type="text" id="targetForceInput" placeholder="Свое число форсирования...">
           <button id="updateForceBtn" class="action-btn">Задать</button>
-        </div>
-
-        <!-- Quick Preset Buttons -->
-        <div class="preset-buttons">
-          <button class="preset-btn" id="presetPhoneBtn">Телефон</button>
-          <button class="preset-btn" id="presetDateBtn">Сегодняшняя дата</button>
-          <button class="preset-btn" id="presetTimeBtn">Текущее время</button>
-          <button class="preset-btn" id="presetPinBtn">PIN 2580</button>
-        </div>
-      </div>
-
-      <!-- Remote Skin Switcher for Spectator's Calculator -->
-      <div class="control-card">
-        <div class="card-header">
-          <span>СКИН КАЛЬКУЛЯТОРА ЗРИТЕЛЯ</span>
-          <span class="mode-badge" id="skinBadge">ANDROID</span>
-        </div>
-        <div class="preset-buttons" style="grid-template-columns: repeat(3, 1fr);">
-          <button class="preset-btn active" id="skinAndroidBtn">Google Pixel</button>
-          <button class="preset-btn" id="skinIosBtn">Apple iOS 18</button>
-          <button class="preset-btn" id="skinSamsungBtn">Samsung</button>
-        </div>
-      </div>
-
-      <!-- Mode Switcher -->
-      <div class="mode-switch-grid" style="grid-template-columns: repeat(3, 1fr);">
-        <button class="mode-btn active" id="modeToxicBtn">Toxic (Форс)</button>
-        <button class="mode-btn" id="modeTimeBtn">Time (Время)</button>
-        <button class="mode-btn" id="modePanicBtn">Panic (Обычный)</button>
-      </div>
-
-      <!-- Quick Room Switcher & QR Link -->
-      <div class="room-card">
-        <div class="room-row">
-          <label for="roomInput">Код сессии:</label>
-          <input type="text" id="roomInput" value="default">
-          <button id="switchRoomBtn" class="action-btn">Сменить</button>
-        </div>
-        <div class="calc-links">
-          <a href="/" target="_blank" class="link-btn" id="openCalcLink">Открыть калькулятор</a>
-          <button class="link-btn" id="copyCalcLinkBtn">Копировать ссылку</button>
         </div>
       </div>
     </section>

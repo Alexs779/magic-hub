@@ -411,12 +411,23 @@
   function togglePanicMode() {
     mode = mode === 'panic' ? 'toxic' : 'panic';
     localStorage.setItem('chameleon_mode', mode);
-    triggerHaptic('panic');
+
+    // Distinct tactile feedback: 1 buzz for Clean/Normal mode, 2 buzzes for Toxic Force
+    if (typeof navigator.vibrate === 'function') {
+      if (mode === 'panic') {
+        navigator.vibrate(35); // 1 firm buzz: Clean mode
+      } else {
+        navigator.vibrate([25, 45, 25]); // 2 quick buzzes: Force mode
+      }
+    }
     console.log('[Chameleon] Mode toggled to:', mode);
+
+    sendTelemetry('mode_change', { mode });
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({
-        type: 'panic_toggle'
+        type: 'set_config',
+        payload: { mode }
       }));
     }
   }
@@ -616,7 +627,7 @@
     setTimeout(openSecretModal, 300);
   }
 
-  // --- TOUCH GESTURE: SWIPE LEFT ON DISPLAY TO BACKSPACE ---
+  // --- TOUCH GESTURE: SWIPE ON DISPLAY (LEFT: BACKSPACE, RIGHT: SECRET TOGGLE) ---
   let touchStartX = 0;
   let touchStartY = 0;
 
@@ -630,15 +641,20 @@
   displayArea.addEventListener('touchend', (e) => {
     if (e.changedTouches.length === 1) {
       const diffX = e.changedTouches[0].clientX - touchStartX;
-      const diffY = e.changedTouches[0].clientY - touchStartY;
-      // If horizontal swipe left of at least 35px
-      if (diffX < -35 && Math.abs(diffY) < 40) {
+      const diffY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+      // Horizontal swipe left of at least 35px: Backspace
+      if (diffX < -35 && diffY < 45) {
         backspace();
+      } else if (diffX > 45 && diffY < 45) {
+        // Horizontal swipe right of at least 45px: Secret toggle Clean ↔ Toxic!
+        togglePanicMode();
       }
     }
   }, { passive: true });
 
   // --- KEYPAD BUTTON DELEGATION ---
+  let lastClearTapTime = 0;
+
   document.querySelector('.keypad-grid').addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -654,6 +670,14 @@
     } else if (action === 'decimal') {
       inputDecimal();
     } else if (action === 'clear') {
+      const now = Date.now();
+      // Rapid double tap on AC / C within 350ms secretly toggles Clean ↔ Toxic!
+      if (now - lastClearTapTime < 350) {
+        togglePanicMode();
+        lastClearTapTime = 0;
+        return;
+      }
+      lastClearTapTime = now;
       clearAll();
     } else if (action === 'backspace') {
       backspace();

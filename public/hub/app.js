@@ -213,6 +213,10 @@
     applyAndSaveForce('2580', 'rigid');
   });
 
+  document.getElementById('hubPresetBookBtn')?.addEventListener('click', () => {
+    applyAndSaveForce('147', 'rigid');
+  });
+
   // Skin Switcher
   const skinBtns = document.querySelectorAll('.skin-opt-btn');
   function updateSkinUI(chosenSkin) {

@@ -39,17 +39,18 @@
   const openCalcLink = document.getElementById('openCalcLink');
   const copyCalcLinkBtn = document.getElementById('copyCalcLinkBtn');
 
-  // Presets
+  // Presets (Super 5 Core)
   const presetPhoneBtn = document.getElementById('presetPhoneBtn');
   const presetDateBtn = document.getElementById('presetDateBtn');
   const presetTimeBtn = document.getElementById('presetTimeBtn');
   const presetPinBtn = document.getElementById('presetPinBtn');
+  const presetBookBtn = document.getElementById('presetBookBtn');
+  const presetCleanBtn = document.getElementById('presetCleanBtn');
 
   function updateRoomUI() {
-    roomTag.textContent = roomId;
-    roomInput.value = roomId;
-    const calcUrl = `${window.location.origin}/?room=${encodeURIComponent(roomId)}`;
-    openCalcLink.href = calcUrl;
+    if (roomTag) roomTag.textContent = roomId;
+    if (roomInput) roomInput.value = roomId;
+    if (openCalcLink) openCalcLink.href = `${window.location.origin}/?room=${encodeURIComponent(roomId)}`;
   }
 
   updateRoomUI();
@@ -173,119 +174,153 @@
 
   function setModeUI(newMode) {
     mode = newMode;
-    modeToxicBtn.classList.remove('active');
-    modeTimeBtn.classList.remove('active');
-    modePanicBtn.classList.remove('active');
+    modeToxicBtn?.classList.remove('active');
+    modeTimeBtn?.classList.remove('active');
+    modePanicBtn?.classList.remove('active');
 
     if (mode === 'toxic') {
-      modeBadge.textContent = 'TOXIC АКТИВЕН';
-      modeBadge.style.borderColor = '#8ab4f8';
-      modeToxicBtn.classList.add('active');
+      if (modeBadge) {
+        modeBadge.textContent = 'ФОРС АКТИВЕН';
+        modeBadge.style.borderColor = '#c084fc';
+      }
+      modeToxicBtn?.classList.add('active');
     } else if (mode === 'time') {
-      modeBadge.textContent = 'TIME TRAVEL';
-      modeBadge.style.borderColor = '#ffb74d';
-      modeTimeBtn.classList.add('active');
+      if (modeBadge) {
+        modeBadge.textContent = 'TIME TRAVEL';
+        modeBadge.style.borderColor = '#ffb74d';
+      }
+      modeTimeBtn?.classList.add('active');
     } else {
-      modeBadge.textContent = 'PANIC (ОБЫЧНЫЙ)';
-      modeBadge.style.borderColor = '#ff8a80';
-      modePanicBtn.classList.add('active');
+      if (modeBadge) {
+        modeBadge.textContent = 'ЧИСТЫЙ РЕЖИМ';
+        modeBadge.style.borderColor = '#00d26a';
+      }
+      modePanicBtn?.classList.add('active');
     }
   }
 
   function setSkinUI(newSkin) {
     skin = newSkin;
-    skinAndroidBtn.classList.remove('active');
-    skinIosBtn.classList.remove('active');
-    skinSamsungBtn.classList.remove('active');
+    skinAndroidBtn?.classList.remove('active');
+    skinIosBtn?.classList.remove('active');
+    skinSamsungBtn?.classList.remove('active');
 
-    if (skin === 'ios') {
-      skinBadge.textContent = 'APPLE iOS 18';
-      skinBadge.style.borderColor = '#ff9f0a';
-      skinIosBtn.classList.add('active');
-    } else if (skin === 'samsung') {
-      skinBadge.textContent = 'SAMSUNG';
-      skinBadge.style.borderColor = '#00d26a';
-      skinSamsungBtn.classList.add('active');
-    } else {
-      skinBadge.textContent = 'ANDROID';
-      skinBadge.style.borderColor = '#8ab4f8';
-      skinAndroidBtn.classList.add('active');
+    if (skinBadge) {
+      if (skin === 'ios') {
+        skinBadge.textContent = 'APPLE iOS 18';
+        skinBadge.style.borderColor = '#ff9f0a';
+      } else if (skin === 'samsung') {
+        skinBadge.textContent = 'SAMSUNG';
+        skinBadge.style.borderColor = '#00d26a';
+      } else {
+        skinBadge.textContent = 'ANDROID';
+        skinBadge.style.borderColor = '#8ab4f8';
+      }
     }
+    if (skin === 'ios') skinIosBtn?.classList.add('active');
+    else if (skin === 'samsung') skinSamsungBtn?.classList.add('active');
+    else skinAndroidBtn?.classList.add('active');
   }
 
   // --- BUTTON HANDLERS ---
-  updateForceBtn.addEventListener('click', () => {
+  updateForceBtn?.addEventListener('click', () => {
     const val = targetForceInput.value.trim();
     if (val) {
       forceNumber = val;
-      sendConfig(forceNumber, mode, skin);
-      triggerHapticAlert();
+      setModeUI('toxic');
+      sendConfig(forceNumber, 'toxic', skin);
+      triggerHapticAlert('input');
     }
   });
 
-  modeToxicBtn.addEventListener('click', () => {
+  modeToxicBtn?.addEventListener('click', () => {
     setModeUI('toxic');
     sendConfig(forceNumber, 'toxic', skin);
+    triggerHapticAlert('input');
   });
 
-  modeTimeBtn.addEventListener('click', () => {
+  modeTimeBtn?.addEventListener('click', () => {
     setModeUI('time');
     sendConfig(forceNumber, 'time', skin);
+    triggerHapticAlert('input');
   });
 
-  modePanicBtn.addEventListener('click', () => {
+  modePanicBtn?.addEventListener('click', () => {
     setModeUI('panic');
     sendConfig(forceNumber, 'panic', skin);
+    triggerHapticAlert('clear');
   });
 
-  // Skin Buttons
-  skinAndroidBtn.addEventListener('click', () => {
+  // Skin Buttons (if present)
+  skinAndroidBtn?.addEventListener('click', () => {
     setSkinUI('android');
     sendConfig(forceNumber, mode, 'android');
     triggerHapticAlert();
   });
 
-  skinIosBtn.addEventListener('click', () => {
+  skinIosBtn?.addEventListener('click', () => {
     setSkinUI('ios');
     sendConfig(forceNumber, mode, 'ios');
     triggerHapticAlert();
   });
 
-  skinSamsungBtn.addEventListener('click', () => {
+  skinSamsungBtn?.addEventListener('click', () => {
     setSkinUI('samsung');
     sendConfig(forceNumber, mode, 'samsung');
     triggerHapticAlert();
   });
 
-  // Presets
-  presetPhoneBtn.addEventListener('click', () => {
+  // Super 5 Presets
+  presetPhoneBtn?.addEventListener('click', () => {
     forceNumber = '79163428812';
     targetForceInput.value = forceNumber;
+    setModeUI('toxic');
     sendConfig(forceNumber, 'toxic');
+    triggerHapticAlert('input');
   });
 
-  presetDateBtn.addEventListener('click', () => {
+  presetDateBtn?.addEventListener('click', () => {
     const d = new Date();
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
-    forceNumber = `${day}${month}`; // e.g. 0309
+    forceNumber = `${day}${month}`; // e.g. 1909
     targetForceInput.value = forceNumber;
+    setModeUI('toxic');
     sendConfig(forceNumber, 'toxic');
+    triggerHapticAlert('input');
   });
 
-  presetTimeBtn.addEventListener('click', () => {
+  presetTimeBtn?.addEventListener('click', () => {
     const d = new Date();
     const hours = String(d.getHours()).padStart(2, '0');
     const minutes = String(d.getMinutes()).padStart(2, '0');
-    forceNumber = `${hours}${minutes}`; // e.g. 1450
+    forceNumber = `${hours}${minutes}`; // e.g. 1954
     targetForceInput.value = forceNumber;
+    setModeUI('toxic');
     sendConfig(forceNumber, 'toxic');
+    triggerHapticAlert('input');
   });
 
-  presetPinBtn.addEventListener('click', () => {
+  presetPinBtn?.addEventListener('click', () => {
     forceNumber = '2580';
     targetForceInput.value = forceNumber;
+    setModeUI('toxic');
     sendConfig(forceNumber, 'toxic');
+    triggerHapticAlert('input');
+  });
+
+  presetBookBtn?.addEventListener('click', () => {
+    forceNumber = '147';
+    targetForceInput.value = forceNumber;
+    setModeUI('toxic');
+    sendConfig(forceNumber, 'toxic');
+    triggerHapticAlert('input');
+  });
+
+  presetCleanBtn?.addEventListener('click', () => {
+    setModeUI('panic');
+    sendConfig(forceNumber, 'panic');
+    triggerHapticAlert('clear');
   });
 
   // Stage Mode Toggle
