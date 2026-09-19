@@ -444,16 +444,16 @@
     lastNotesTap = now;
   }, { passive: true });
 
-  // Room switcher
-  switchRoomBtn.addEventListener('click', () => {
-    const newRoom = roomInput.value.trim().toLowerCase();
+  // Room switcher (if present)
+  switchRoomBtn?.addEventListener('click', () => {
+    const newRoom = roomInput?.value.trim().toLowerCase();
     if (newRoom && newRoom !== roomId) {
       window.location.search = `?room=${encodeURIComponent(newRoom)}`;
     }
   });
 
-  // Copy Calculator URL
-  copyCalcLinkBtn.addEventListener('click', () => {
+  // Copy Calculator URL (if present)
+  copyCalcLinkBtn?.addEventListener('click', () => {
     const calcUrl = `${window.location.origin}/?room=${encodeURIComponent(roomId)}`;
     navigator.clipboard.writeText(calcUrl).then(() => {
       const origText = copyCalcLinkBtn.textContent;

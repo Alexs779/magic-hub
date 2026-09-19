@@ -3,7 +3,7 @@
  * Caches assets for 100% offline capability
  */
 
-const CACHE_NAME = 'chameleon-calc-v4';
+const CACHE_NAME = 'chameleon-calc-v5';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -13,7 +13,11 @@ const ASSETS_TO_CACHE = [
   '/performer.css',
   '/performer.js',
   '/manifest.json',
-  '/icon.svg'
+  '/icon.svg',
+  '/hub/',
+  '/hub/index.html',
+  '/hub/style.css',
+  '/hub/app.js'
 ];
 
 self.addEventListener('install', (event) => {
