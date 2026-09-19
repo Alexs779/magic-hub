@@ -166,32 +166,6 @@
     });
   });
 
-  // --- CATALOG FILTERS (ALL VS OWNED) ---
-  const filterPills = document.querySelectorAll('.filter-pill');
-  const trickCards = document.querySelectorAll('.trick-card');
-
-  filterPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      const filter = pill.getAttribute('data-filter');
-      triggerHaptic('selection');
-
-      filterPills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-
-      trickCards.forEach(card => {
-        if (filter === 'all') {
-          card.style.display = 'block';
-        } else if (filter === 'owned') {
-          if (card.classList.contains('trick-card-owned')) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
-        }
-      });
-    });
-  });
-
   // --- TRICK SETTINGS (CHAMELEON CALCULATOR) ---
   function applyAndSaveForce(val, feedbackType = 'rigid') {
     if (!val) return;
@@ -331,11 +305,10 @@
 
   // --- TELEGRAM BACK BUTTON & MODAL CONTROLLER ---
   const pwaModal = document.getElementById('pwaModal');
-  const checkoutModal = document.getElementById('checkoutModal');
 
   function updateTgBackButton() {
     if (!tg?.BackButton) return;
-    const anyModalOpen = pwaModal?.classList.contains('active') || checkoutModal?.classList.contains('active');
+    const anyModalOpen = pwaModal?.classList.contains('active');
     if (anyModalOpen) {
       tg.BackButton.show();
       tg.BackButton.onClick(closeAllModals);
@@ -346,7 +319,6 @@
 
   function closeAllModals() {
     pwaModal?.classList.remove('active');
-    checkoutModal?.classList.remove('active');
     updateTgBackButton();
   }
 
@@ -367,93 +339,6 @@
       pwaModal.classList.remove('active');
       updateTgBackButton();
     }
-  });
-
-  // --- CHECKOUT & STORE PURCHASE FLOW ---
-  const openArtforceCheckoutBtn = document.getElementById('openArtforceCheckoutBtn');
-  const closeCheckoutModalBtn = document.getElementById('closeCheckoutModalBtn');
-  const notifySonicBtn = document.getElementById('notifySonicBtn');
-  const checkoutPayTonBtn = document.getElementById('checkoutPayTonBtn');
-  const checkoutPaySbpBtn = document.getElementById('checkoutPaySbpBtn');
-
-  openArtforceCheckoutBtn?.addEventListener('click', () => {
-    triggerHaptic('medium');
-    checkoutModal?.classList.add('active');
-    updateTgBackButton();
-  });
-
-  closeCheckoutModalBtn?.addEventListener('click', () => {
-    checkoutModal?.classList.remove('active');
-    updateTgBackButton();
-  });
-
-  checkoutModal?.addEventListener('click', (e) => {
-    if (e.target === checkoutModal) {
-      checkoutModal.classList.remove('active');
-      updateTgBackButton();
-    }
-  });
-
-  notifySonicBtn?.addEventListener('click', () => {
-    triggerHaptic('success');
-    showToast('Вы добавлены в список ожидания Sonic Mind!');
-  });
-
-  // Handle USDT direct checkout via TON Connect
-  checkoutPayTonBtn?.addEventListener('click', async () => {
-    if (!tonConnectUI) {
-      showToast('TON Connect недоступен', 'error');
-      return;
-    }
-
-    if (!tonConnectUI.connected) {
-      triggerHaptic('light');
-      showToast('Подключите кошелек для оплаты в USDT', 'info');
-      try {
-        await tonConnectUI.openModal();
-      } catch (e) {}
-      return;
-    }
-
-    try {
-      triggerHaptic('medium');
-      showToast('Подготовка транзакции на 49 USDT...', 'info');
-
-      // USDT Jetton transfer on TON: 49 USDT (decimals = 6 -> 49,000,000 units)
-      // Merchant wallet address on TON
-      const merchantAddress = 'UQBIh-v8fK1q7tHkQGfE2Y0P1r0v0M7h_m4E_qOQ1lE8Kk';
-
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 360,
-        messages: [
-          {
-            address: merchantAddress,
-            amount: '50000000', // 0.05 TON network commission / fallback
-            payload: '' // order memo
-          }
-        ]
-      };
-
-      await tonConnectUI.sendTransaction(transaction);
-      triggerHaptic('success');
-      showToast('Оплата 49 USDT успешна! Доступ активирован.', 'success');
-      checkoutModal?.classList.remove('active');
-      updateTgBackButton();
-    } catch (err) {
-      console.warn('Transaction cancelled or failed:', err);
-      if (err?.message?.includes('reject') || err?.message?.includes('cancel')) {
-        showToast('Транзакция отменена пользователем', 'info');
-      } else {
-        showToast('Ошибка транзакции USDT', 'error');
-      }
-    }
-  });
-
-  // Handle USDT TRC-20 / Card payment via Support
-  checkoutPaySbpBtn?.addEventListener('click', () => {
-    triggerHaptic('medium');
-    const msg = encodeURIComponent(`Здравствуйте! Хочу оплатить предзаказ ArtForce (49 USDT). Пришлите реквизиты кошелька (USDT TRC-20 / TON / Картой). Мой ID: ${userId}`);
-    window.open(`https://t.me/MagicHubSupportBot?start=${msg}`, '_blank');
   });
 
 })();

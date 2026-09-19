@@ -45,16 +45,10 @@
            ======================================================= -->
       <section class="tab-view active" id="view-tricks">
         
-        <!-- Filter Tabs: Каталог vs Мои трюки -->
-        <div class="catalog-filter-row">
-          <button class="filter-pill active" data-filter="all">ВСЕ ФОКУСЫ (3)</button>
-          <button class="filter-pill" data-filter="owned">МОИ АКТИВНЫЕ (1)</button>
-        </div>
-
-        <!-- 1. CHAMELEON CALCULATOR (АКТИВНЫЙ ФОКУС) -->
+        <!-- CHAMELEON CALCULATOR (ФЛАГМАНСКИЙ ФОКУС) -->
         <div class="glass-card trick-card trick-card-owned" data-trick="calculator">
           <div class="trick-badge-row">
-            <span class="badge-active"><span class="pulse-dot"></span> КУПЛЕНО // ДОСТУП АКТИВЕН</span>
+            <span class="badge-active"><span class="pulse-dot"></span> ДОСТУП АКТИВЕН</span>
             <span class="trick-price-tag">45 USDT</span>
           </div>
 
@@ -89,7 +83,7 @@
               </div>
               <div class="input-with-btn">
                 <input type="tel" id="hubForceInput" placeholder="79163428812" autocomplete="off">
-                <button class="save-field-btn" id="hubSaveForceBtn">СОХРАНИТЬ</button>
+                <button class="save-field-btn" id="hubSaveForceBtn">OK</button>
               </div>
               <div class="quick-presets-row">
                 <button type="button" class="chip-btn" id="hubPresetDateBtn">ДАТА</button>
@@ -148,62 +142,6 @@
               <i class="fa-solid fa-chevron-right strip-arrow"></i>
             </div>
           </div>
-        </div>
-
-        <!-- 2. ARTFORCE (SHOWCASE ITEM: МУЗЕЙНЫЙ АРХИВ) -->
-        <div class="glass-card trick-card trick-card-store" data-trick="artforce">
-          <div class="trick-badge-row">
-            <span class="badge-store">ПРЕДЗАКАЗ // ВИТРИНА</span>
-            <span class="trick-price-tag">49 USDT <span style="text-decoration: line-through; opacity: 0.45; font-size: 0.65rem;">79 USDT</span></span>
-          </div>
-
-          <div class="trick-header">
-            <div class="trick-title-wrap">
-              <h2>ArtForce // Музейная Галерея</h2>
-              <span class="trick-subtitle">Эффект: Телепатическое чтение картин</span>
-            </div>
-            <div class="trick-glyph"><i class="fa-solid fa-palette"></i></div>
-          </div>
-
-          <div class="effect-teaser-box">
-            <div class="teaser-header">
-              <i class="fa-solid fa-eye"></i>
-              <strong>ЧТО ВИДИТ ЗРИТЕЛЬ:</strong>
-            </div>
-            <p>Вы открываете на телефоне сайт государственной картинной галереи со 100 мировыми шедеврами. Зритель свободно листает каталог и мысленно загадывает любую картину. Вы с закрытыми глазами за 30 секунд зарисовываете именно её на салфетке!</p>
-          </div>
-
-          <button class="store-preorder-btn" id="openArtforceCheckoutBtn">
-            <i class="fa-solid fa-lock-open"></i> ОФОРМИТЬ ПРЕДЗАКАЗ (49 USDT)
-          </button>
-        </div>
-
-        <!-- 3. SONIC MIND (SHOWCASE ITEM: SPOTIFY ТЕЛЕПАТИЯ) -->
-        <div class="glass-card trick-card trick-card-store" data-trick="sonic">
-          <div class="trick-badge-row">
-            <span class="badge-store">СКОРО В ХАБЕ</span>
-            <span class="trick-price-tag">39 USDT</span>
-          </div>
-
-          <div class="trick-header">
-            <div class="trick-title-wrap">
-              <h2>Sonic Mind // Музыкальные Мысли</h2>
-              <span class="trick-subtitle">Эффект: Угадывание трека в Spotify / Apple Music</span>
-            </div>
-            <div class="trick-glyph"><i class="fa-solid fa-music"></i></div>
-          </div>
-
-          <div class="effect-teaser-box">
-            <div class="teaser-header">
-              <i class="fa-solid fa-headphones"></i>
-              <strong>ЧТО ВИДИТ ЗРИТЕЛЬ:</strong>
-            </div>
-            <p>Зритель на своем или вашем телефоне ищет любую песню своей молодости или любимого исполнителя. Музыка не играет. Менталист напевает мелодию и называет песню вслух!</p>
-          </div>
-
-          <button class="store-secondary-btn" id="notifySonicBtn">
-            <i class="fa-regular fa-bell"></i> УВЕДОМИТЬ О РЕЛИЗЕ
-          </button>
         </div>
 
       </section>
@@ -379,56 +317,6 @@
     </div>
 
     <!-- CHECKOUT MODAL (SMOKED GLASS) -->
-    <div class="pwa-modal-backdrop" id="checkoutModal">
-      <div class="pwa-modal-content">
-        <div class="pwa-modal-header">
-          <div>
-            <span class="passport-tag">CHECKOUT // ОФОРМЛЕНИЕ ДОСТУПА</span>
-            <h3 id="checkoutTrickTitle">ArtForce // Музейная Галерея</h3>
-          </div>
-          <button class="close-modal-btn" id="closeCheckoutModalBtn"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="checkout-modal-body">
-          <div class="checkout-price-card">
-            <div>
-              <div class="checkout-price-main" id="checkoutPriceMain">49 USDT <span class="checkout-price-sub">// ПРЕДЗАКАЗ (БЫЛО 79 USDT)</span></div>
-            </div>
-            <div class="checkout-discount-badge" id="checkoutDiscountBadge">СКИДКА 40%</div>
-          </div>
-
-          <div class="checkout-features-list">
-            <div class="feature-item">
-              <i class="fa-solid fa-check"></i>
-              <span>Пожизненный доступ к сайту галереи со всеми картинами</span>
-            </div>
-            <div class="feature-item">
-              <i class="fa-solid fa-check"></i>
-              <span>Скрытая телеметрия выбора зрителя в Stealth Console</span>
-            </div>
-            <div class="feature-item">
-              <i class="fa-solid fa-check"></i>
-              <span>Видеоразбор психологических паттернов ментализма</span>
-            </div>
-          </div>
-
-          <div class="checkout-actions-group">
-            <button type="button" class="checkout-btn ton-pay-btn" id="checkoutPayTonBtn">
-              <i class="fa-solid fa-dollar-sign"></i>
-              <span>Оплатить 49 USDT (Telegram Wallet / TON)</span>
-            </button>
-            <button type="button" class="checkout-btn sbp-pay-btn" id="checkoutPaySbpBtn">
-              <i class="fa-solid fa-globe"></i>
-              <span>Оплатить USDT (TRC-20) / Картой РФ</span>
-            </button>
-          </div>
-
-          <p class="checkout-security-note">
-            <i class="fa-solid fa-shield-halved"></i> Мгновенная автоматическая привязка к вашему Telegram ID.
-          </p>
-        </div>
-      </div>
-    </div>
-
     <!-- STRICT TOAST NOTIFICATION -->
     <div class="toast-capsule" id="toastCapsule">
       <i class="fa-solid fa-circle-check toast-icon" id="toastIcon"></i>
