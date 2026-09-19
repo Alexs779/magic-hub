@@ -193,17 +193,23 @@
   });
 
   // --- TRICK SETTINGS (CHAMELEON CALCULATOR) ---
+  function applyAndSaveForce(val, feedbackType = 'rigid') {
+    if (!val) return;
+    hubForceInput.value = val;
+    forceNumber = val;
+    localStorage.setItem(`hub_force_${roomId}`, forceNumber);
+    saveConfigToServer(forceNumber, skin, mode);
+    triggerHaptic(feedbackType);
+    showToast(`Число сохранено: ${val}`);
+  }
+
   hubSaveForceBtn?.addEventListener('click', () => {
     const val = hubForceInput.value.trim().replace(/[\s\-\(\)\+]/g, '');
     if (val) {
-      forceNumber = val;
-      localStorage.setItem(`hub_force_${roomId}`, forceNumber);
-      saveConfigToServer(forceNumber, skin, mode);
-      triggerHaptic('success');
-      showToast('Число форсирования сохранено');
+      applyAndSaveForce(val, 'success');
 
       const origText = hubSaveForceBtn.textContent;
-      hubSaveForceBtn.textContent = 'СОХРАНЕНО';
+      hubSaveForceBtn.textContent = 'OK';
       hubSaveForceBtn.style.backgroundColor = '#ffffff';
       hubSaveForceBtn.style.color = '#000000';
       setTimeout(() => {
@@ -214,26 +220,23 @@
     }
   });
 
-  // Quick presets
+  // Quick presets with auto-save
   document.getElementById('hubPresetDateBtn')?.addEventListener('click', () => {
     const d = new Date();
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
-    hubForceInput.value = `${day}${month}`;
-    triggerHaptic('rigid');
+    applyAndSaveForce(`${day}${month}`, 'rigid');
   });
 
   document.getElementById('hubPresetTimeBtn')?.addEventListener('click', () => {
     const d = new Date();
     const hours = String(d.getHours()).padStart(2, '0');
     const mins = String(d.getMinutes()).padStart(2, '0');
-    hubForceInput.value = `${hours}${mins}`;
-    triggerHaptic('rigid');
+    applyAndSaveForce(`${hours}${mins}`, 'rigid');
   });
 
   document.getElementById('hubPresetPinBtn')?.addEventListener('click', () => {
-    hubForceInput.value = '2580';
-    triggerHaptic('rigid');
+    applyAndSaveForce('2580', 'rigid');
   });
 
   // Skin Switcher
