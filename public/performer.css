@@ -349,3 +349,87 @@ input {
   color: #e3e3e3;
   padding: 12px 0;
 }
+
+/* =========================================================
+   STAGE MODE (DISTRACTION-FREE HUD FOR PERFORMANCE)
+   ========================================================= */
+body.stage-mode .controls-area {
+  display: none !important;
+}
+
+body.stage-mode .console-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+body.stage-mode .peek-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+body.stage-mode .captured-pin-box {
+  align-items: center;
+}
+
+body.stage-mode .pin-label {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: #666666;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+body.stage-mode .captured-pin {
+  font-size: 4.8rem;
+  font-weight: 800;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  letter-spacing: 8px;
+  padding: 10px 0;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.25);
+}
+
+body.stage-mode .live-expr-box,
+body.stage-mode .live-result-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #1a1a1a;
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+body.stage-mode .live-expression,
+body.stage-mode .live-result {
+  border: none;
+  background: transparent;
+  padding: 4px 0;
+  font-size: 1.4rem;
+}
+
+/* Calculate Finished Pulse */
+.live-result.calculated {
+  color: #00d26a !important;
+  font-weight: 700;
+  animation: resultGlow 1.5s ease;
+}
+
+@keyframes resultGlow {
+  0% { transform: scale(1.04); text-shadow: 0 0 20px #00d26a; }
+  100% { transform: scale(1); text-shadow: none; }
+}
+
+/* Panic Screen Hint */
+.panic-hint {
+  font-size: 0.65rem;
+  color: #444444;
+  text-align: center;
+  margin-top: auto;
+  padding: 12px 0;
+  letter-spacing: 1px;
+  user-select: none;
+}

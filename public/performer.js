@@ -108,8 +108,15 @@
         deviceCount.textContent = `● ${msg.connectedDevices} устр.`;
       }
     } else if (msg.type === 'telemetry') {
-      renderTelemetry(msg.payload);
-      triggerHapticAlert();
+      const data = msg.payload;
+      renderTelemetry(data);
+      if (data?.event === 'calculate') {
+        triggerHapticAlert('calculate');
+      } else if (data?.event === 'clear' || data?.event === 'reset') {
+        triggerHapticAlert('clear');
+      } else {
+        triggerHapticAlert('input');
+      }
     }
   }
 
@@ -131,14 +138,23 @@
     // 3. Final Calculated Result
     if (data.event === 'calculate') {
       liveResultDisplay.textContent = `${data.result} ${data.wasForced ? '(ФОРСИРОВАНО)' : '(ТОЧНО)'}`;
+      liveResultDisplay.classList.add('calculated');
     } else if (data.event === 'clear' || data.event === 'reset') {
       liveResultDisplay.textContent = '—';
+      liveResultDisplay.classList.remove('calculated');
     }
   }
 
-  function triggerHapticAlert() {
+  // Tactical vibration engine
+  function triggerHapticAlert(type = 'input') {
     if (typeof navigator.vibrate === 'function') {
-      navigator.vibrate(30);
+      if (type === 'calculate') {
+        navigator.vibrate([60, 70, 60]); // Distinct double-pulse: spectator pressed "="
+      } else if (type === 'clear') {
+        navigator.vibrate([25, 40, 25]);
+      } else {
+        navigator.vibrate(20); // Crisp single tick for key input
+      }
     }
   }
 
@@ -272,19 +288,78 @@
     sendConfig(forceNumber, 'toxic');
   });
 
+  // Stage Mode Toggle
+  const stageModeToggleBtn = document.getElementById('stageModeToggleBtn');
+  let isStageMode = localStorage.getItem('chameleon_stage_mode') === 'true';
+
+  function updateStageModeUI() {
+    if (isStageMode) {
+      document.body.classList.add('stage-mode');
+      if (stageModeToggleBtn) stageModeToggleBtn.textContent = '⚙️ НАСТРОЙКИ';
+    } else {
+      document.body.classList.remove('stage-mode');
+      if (stageModeToggleBtn) stageModeToggleBtn.textContent = '🎭 СЦЕНА';
+    }
+  }
+
+  stageModeToggleBtn?.addEventListener('click', () => {
+    isStageMode = !isStageMode;
+    localStorage.setItem('chameleon_stage_mode', isStageMode);
+    updateStageModeUI();
+    triggerHapticAlert('input');
+  });
+
+  updateStageModeUI();
+
   // Stealth vs Setup Brightness toggle
   stealthModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('setup-mode');
   });
 
-  // Emergency Notes Screen
-  emergencyToggleBtn.addEventListener('click', () => {
+  // Emergency Notes Screen Toggle
+  function activateEmergency() {
     emergencyScreen.classList.add('active');
-  });
+    if (typeof navigator.vibrate === 'function') navigator.vibrate(40);
+  }
 
-  exitEmergencyBtn.addEventListener('click', () => {
+  function deactivateEmergency() {
     emergencyScreen.classList.remove('active');
-  });
+  }
+
+  emergencyToggleBtn?.addEventListener('click', activateEmergency);
+  exitEmergencyBtn?.addEventListener('click', deactivateEmergency);
+
+  // --- PANIC GESTURES: 2-FINGER TAP & DOUBLE TAP ---
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      // Two finger tap anywhere on screen instantly activates Notes
+      activateEmergency();
+    }
+  }, { passive: true });
+
+  let lastTap = 0;
+  document.addEventListener('touchend', (e) => {
+    if (emergencyScreen.classList.contains('active')) return;
+    if (e.target.closest('button, input, a')) return;
+
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      // Double tap on screen instantly activates Notes
+      activateEmergency();
+    }
+    lastTap = now;
+  }, { passive: true });
+
+  // Double tap on emergency notes screen exits back to console
+  let lastNotesTap = 0;
+  emergencyScreen?.addEventListener('touchend', (e) => {
+    if (e.target.closest('#exitEmergencyBtn')) return;
+    const now = Date.now();
+    if (now - lastNotesTap < 300) {
+      deactivateEmergency();
+    }
+    lastNotesTap = now;
+  }, { passive: true });
 
   // Room switcher
   switchRoomBtn.addEventListener('click', () => {
