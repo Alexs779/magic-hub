@@ -636,6 +636,13 @@ body {
   transform: scale(0.93);
 }
 
+.chip-btn.active {
+  background: var(--primary-gradient);
+  color: #ffffff;
+  border-color: var(--cosmic-purple);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+}
+
 /* SKIN SELECTOR GRID */
 .skin-selector-grid {
   display: grid;

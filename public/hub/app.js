@@ -166,20 +166,59 @@
     });
   });
 
+  // --- PRESET TRACKING & ACTIVE UI ---
+  let userPhone = localStorage.getItem('hub_user_phone') || '79163428812';
+
+  function setActiveChipBtn(activeId) {
+    document.querySelectorAll('.quick-presets-row .chip-btn').forEach(b => {
+      if (b.id === activeId) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+  }
+
+  function detectActivePreset(val) {
+    const d = new Date();
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const todayDate = `${day}${month}`;
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    const currentTime = `${hours}${mins}`;
+
+    if (val === userPhone || val.length >= 10) {
+      setActiveChipBtn('hubPresetPhoneBtn');
+    } else if (val === todayDate) {
+      setActiveChipBtn('hubPresetDateBtn');
+    } else if (val === currentTime) {
+      setActiveChipBtn('hubPresetTimeBtn');
+    } else if (val === '2580') {
+      setActiveChipBtn('hubPresetPinBtn');
+    } else if (val === '147') {
+      setActiveChipBtn('hubPresetBookBtn');
+    } else {
+      setActiveChipBtn(null);
+    }
+  }
+
   // --- TRICK SETTINGS (CHAMELEON CALCULATOR) ---
-  function applyAndSaveForce(val, feedbackType = 'rigid') {
+  function applyAndSaveForce(val, feedbackType = 'rigid', toastMsg = null) {
     if (!val) return;
     hubForceInput.value = val;
     forceNumber = val;
     localStorage.setItem(`hub_force_${roomId}`, forceNumber);
     saveConfigToServer(forceNumber, skin, mode);
+    detectActivePreset(val);
     triggerHaptic(feedbackType);
-    showToast(`Число сохранено: ${val}`);
+    showToast(toastMsg || `Число сохранено: ${val}`);
   }
 
   hubSaveForceBtn?.addEventListener('click', () => {
     const val = hubForceInput.value.trim().replace(/[\s\-\(\)\+]/g, '');
     if (val) {
+      if (val.length >= 10) {
+        userPhone = val;
+        localStorage.setItem('hub_user_phone', userPhone);
+      }
       applyAndSaveForce(val, 'success');
 
       const origText = hubSaveForceBtn.textContent;
@@ -194,28 +233,40 @@
     }
   });
 
-  // Quick presets with auto-save
+  // Quick presets with auto-save & active highlight
+  document.getElementById('hubPresetPhoneBtn')?.addEventListener('click', () => {
+    applyAndSaveForce(userPhone, 'rigid', 'Выбран сценарий: 📞 Звонок в будущее');
+    setActiveChipBtn('hubPresetPhoneBtn');
+  });
+
   document.getElementById('hubPresetDateBtn')?.addEventListener('click', () => {
     const d = new Date();
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
-    applyAndSaveForce(`${day}${month}`, 'rigid');
+    applyAndSaveForce(`${day}${month}`, 'rigid', 'Выбран сценарий: 📅 Дата');
+    setActiveChipBtn('hubPresetDateBtn');
   });
 
   document.getElementById('hubPresetTimeBtn')?.addEventListener('click', () => {
     const d = new Date();
     const hours = String(d.getHours()).padStart(2, '0');
     const mins = String(d.getMinutes()).padStart(2, '0');
-    applyAndSaveForce(`${hours}${mins}`, 'rigid');
+    applyAndSaveForce(`${hours}${mins}`, 'rigid', 'Выбран сценарий: ⏰ Время');
+    setActiveChipBtn('hubPresetTimeBtn');
   });
 
   document.getElementById('hubPresetPinBtn')?.addEventListener('click', () => {
-    applyAndSaveForce('2580', 'rigid');
+    applyAndSaveForce('2580', 'rigid', 'Выбран сценарий: 🔑 PIN 2580');
+    setActiveChipBtn('hubPresetPinBtn');
   });
 
   document.getElementById('hubPresetBookBtn')?.addEventListener('click', () => {
-    applyAndSaveForce('147', 'rigid');
+    applyAndSaveForce('147', 'rigid', 'Выбран сценарий: 📖 Книга 147');
+    setActiveChipBtn('hubPresetBookBtn');
   });
+
+  // Initial detection
+  detectActivePreset(forceNumber);
 
   // Skin Switcher
   const skinBtns = document.querySelectorAll('.skin-opt-btn');

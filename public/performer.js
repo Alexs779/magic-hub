@@ -98,6 +98,7 @@
       if (msg.skin) {
         setSkinUI(msg.skin);
       }
+      detectPresetByForce(forceNumber, mode);
       if (msg.connectedDevices !== undefined) {
         deviceCount.textContent = `● ${msg.connectedDevices} устр.`;
       }
@@ -270,11 +271,50 @@
     triggerHapticAlert();
   });
 
-  // Super 5 Presets
+  // --- PRESET ACTIVE UI TRACKING ---
+  function setActivePresetUI(activeBtn, badgeText) {
+    document.querySelectorAll('.preset-buttons .preset-btn').forEach(b => b.classList.remove('active'));
+    if (activeBtn) activeBtn.classList.add('active');
+    if (modeBadge && badgeText) {
+      modeBadge.textContent = badgeText;
+      modeBadge.style.borderColor = '#c084fc';
+    }
+  }
+
+  function detectPresetByForce(val, currentMode) {
+    if (currentMode === 'panic') {
+      setActivePresetUI(presetCleanBtn, '🛡️ ЧИСТЫЙ РЕЖИМ');
+      return;
+    }
+    const d = new Date();
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const todayDate = `${day}${month}`;
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    const currentTime = `${hours}${mins}`;
+
+    if (val === '79163428812' || val?.length >= 10) {
+      setActivePresetUI(presetPhoneBtn, '📞 ЗВОНОК В БУДУЩЕЕ');
+    } else if (val === todayDate) {
+      setActivePresetUI(presetDateBtn, '📅 ДАТА');
+    } else if (val === currentTime) {
+      setActivePresetUI(presetTimeBtn, '⏰ ВРЕМЯ');
+    } else if (val === '2580') {
+      setActivePresetUI(presetPinBtn, '🔑 PIN 2580');
+    } else if (val === '147') {
+      setActivePresetUI(presetBookBtn, '📖 КНИГА 147');
+    } else {
+      setActivePresetUI(null, 'ФОРС АКТИВЕН');
+    }
+  }
+
+  // Super 5 Presets with Visual Synchronization
   presetPhoneBtn?.addEventListener('click', () => {
     forceNumber = '79163428812';
     targetForceInput.value = forceNumber;
     setModeUI('toxic');
+    setActivePresetUI(presetPhoneBtn, '📞 ЗВОНОК В БУДУЩЕЕ');
     sendConfig(forceNumber, 'toxic');
     triggerHapticAlert('input');
   });
@@ -286,6 +326,7 @@
     forceNumber = `${day}${month}`; // e.g. 1909
     targetForceInput.value = forceNumber;
     setModeUI('toxic');
+    setActivePresetUI(presetDateBtn, '📅 ДАТА');
     sendConfig(forceNumber, 'toxic');
     triggerHapticAlert('input');
   });
@@ -297,6 +338,7 @@
     forceNumber = `${hours}${minutes}`; // e.g. 1954
     targetForceInput.value = forceNumber;
     setModeUI('toxic');
+    setActivePresetUI(presetTimeBtn, '⏰ ВРЕМЯ');
     sendConfig(forceNumber, 'toxic');
     triggerHapticAlert('input');
   });
@@ -305,6 +347,7 @@
     forceNumber = '2580';
     targetForceInput.value = forceNumber;
     setModeUI('toxic');
+    setActivePresetUI(presetPinBtn, '🔑 PIN 2580');
     sendConfig(forceNumber, 'toxic');
     triggerHapticAlert('input');
   });
@@ -313,15 +356,20 @@
     forceNumber = '147';
     targetForceInput.value = forceNumber;
     setModeUI('toxic');
+    setActivePresetUI(presetBookBtn, '📖 КНИГА 147');
     sendConfig(forceNumber, 'toxic');
     triggerHapticAlert('input');
   });
 
   presetCleanBtn?.addEventListener('click', () => {
     setModeUI('panic');
+    setActivePresetUI(presetCleanBtn, '🛡️ ЧИСТЫЙ РЕЖИМ');
     sendConfig(forceNumber, 'panic');
     triggerHapticAlert('clear');
   });
+
+  // Initial preset detection
+  detectPresetByForce(forceNumber, mode);
 
   // Stage Mode Toggle
   const stageModeToggleBtn = document.getElementById('stageModeToggleBtn');
