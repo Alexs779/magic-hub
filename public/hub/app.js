@@ -619,11 +619,22 @@
     }
   });
 
+  // Secure admin headers helper
+  function getAdminHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (tg?.initData) headers['x-telegram-init-data'] = tg.initData;
+    const token = localStorage.getItem('hub_admin_token');
+    if (token) headers['x-admin-token'] = token;
+    return headers;
+  }
+
   // --- ADMIN CONSOLE LOGIC ---
   async function loadAdminOverview() {
     if (!isUserAdmin) return;
     try {
-      const res = await fetch(`/api/admin/overview?adminId=${encodeURIComponent(userId)}`);
+      const res = await fetch(`/api/admin/overview?adminId=${encodeURIComponent(userId)}`, {
+        headers: getAdminHeaders()
+      });
       if (res.ok) {
         const data = await res.json();
         renderAdminOverview(data);
@@ -712,7 +723,7 @@
     try {
       const res = await fetch('/api/admin/approve', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ adminId: userId, targetUserId })
       });
       const d = await res.json();
@@ -731,7 +742,7 @@
     try {
       const res = await fetch('/api/admin/reject', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ adminId: userId, targetUserId })
       });
       const d = await res.json();
@@ -750,7 +761,7 @@
     try {
       const res = await fetch('/api/admin/revoke', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ adminId: userId, identifier })
       });
       const d = await res.json();
@@ -782,7 +793,7 @@
     try {
       const res = await fetch('/api/admin/grant', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ adminId: userId, identifier: val })
       });
       const d = await res.json();
@@ -807,7 +818,7 @@
     try {
       const res = await fetch('/api/admin/wallet', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ adminId: userId, trc20, ton })
       });
       const d = await res.json();

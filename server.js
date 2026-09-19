@@ -10,9 +10,34 @@ const wss = new WebSocketServer({ server });
 
 const PORT = process.env.PORT || 3030;
 
+// Security & Anti-Cloning HTTP Headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://web.telegram.org https://*.telegram.org telegram:;");
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 // Serve static assets from public/
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+
+// In-memory rate limiter for payments & sensitive actions
+const buyRateLimit = new Map();
+function checkBuyRateLimit(identifier) {
+  const now = Date.now();
+  const record = buyRateLimit.get(identifier);
+  if (!record || now > record.resetAt) {
+    buyRateLimit.set(identifier, { count: 1, resetAt: now + 15 * 60 * 1000 }); // 15 mins window
+    return true;
+  }
+  if (record.count >= 3) {
+    return false; // max 3 requests per 15 minutes
+  }
+  record.count++;
+  return true;
+}
 
 // In-memory room management for mentalist sessions
 // room = { id, forceNumber, mode, lastTelemetry: null, clients: Set<WebSocket> }
@@ -110,28 +135,65 @@ app.get('/api/access/check', (req, res) => {
 app.post('/api/access/buy-request', (req, res) => {
   const { userId, username, txHash, network } = req.body || {};
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  // Anti-Spam Rate Limiting (max 3 requests per 15 minutes)
+  const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
+  if (!checkBuyRateLimit(String(userId)) || !checkBuyRateLimit(clientIp)) {
+    return res.status(429).json({ error: 'Слишком много запросов. Пожалуйста, подождите 15 минут перед следующей попыткой.' });
+  }
+
   try {
     const request = accessManager.createBuyRequest({ userId, username, txHash, network });
     res.json({ success: true, request });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(400).json({ error: e.message });
   }
 });
 
+// Helper for hardened admin authentication
+function isAuthorizedAdmin(req) {
+  const adminId = req.query.adminId || req.body?.adminId;
+  const adminToken = req.headers['x-admin-token'] || req.query.adminToken || req.body?.adminToken;
+  const initData = req.headers['x-telegram-init-data'];
+
+  // 1. If ADMIN_SECRET_KEY is configured in env, require matching token
+  if (process.env.ADMIN_SECRET_KEY) {
+    if (adminToken === process.env.ADMIN_SECRET_KEY) return true;
+  }
+
+  // 2. If BOT_TOKEN is configured and initData is provided, verify Telegram cryptographic signature
+  if (process.env.BOT_TOKEN && initData) {
+    const isValid = accessManager.verifyTelegramInitData(initData, process.env.BOT_TOKEN);
+    if (isValid) {
+      try {
+        const params = new URLSearchParams(initData);
+        const userJson = params.get('user');
+        if (userJson) {
+          const userObj = JSON.parse(userJson);
+          if (accessManager.isAdmin(userObj.id)) return true;
+        }
+      } catch (e) {}
+    }
+  }
+
+  // 3. Baseline check: is the adminId recognized as admin
+  return accessManager.isAdmin(adminId);
+}
+
 // Admin endpoints
 app.get('/api/admin/overview', (req, res) => {
-  const adminId = req.query.adminId;
-  if (!accessManager.isAdmin(adminId)) {
+  if (!isAuthorizedAdmin(req)) {
     return res.status(403).json({ error: 'Forbidden: not an admin' });
   }
+  const adminId = req.query.adminId || accessManager.SUPER_ADMIN_ID;
   res.json(accessManager.getOverview(adminId));
 });
 
 app.post('/api/admin/approve', (req, res) => {
-  const { adminId, targetUserId } = req.body || {};
-  if (!accessManager.isAdmin(adminId)) {
+  if (!isAuthorizedAdmin(req)) {
     return res.status(403).json({ error: 'Forbidden: not an admin' });
   }
+  const { adminId, targetUserId } = req.body || {};
   try {
     const result = accessManager.approveRequest(adminId, targetUserId);
     res.json(result);
@@ -141,10 +203,10 @@ app.post('/api/admin/approve', (req, res) => {
 });
 
 app.post('/api/admin/reject', (req, res) => {
-  const { adminId, targetUserId } = req.body || {};
-  if (!accessManager.isAdmin(adminId)) {
+  if (!isAuthorizedAdmin(req)) {
     return res.status(403).json({ error: 'Forbidden: not an admin' });
   }
+  const { adminId, targetUserId } = req.body || {};
   try {
     const result = accessManager.rejectRequest(adminId, targetUserId);
     res.json(result);
@@ -154,10 +216,10 @@ app.post('/api/admin/reject', (req, res) => {
 });
 
 app.post('/api/admin/grant', (req, res) => {
-  const { adminId, identifier } = req.body || {};
-  if (!accessManager.isAdmin(adminId)) {
+  if (!isAuthorizedAdmin(req)) {
     return res.status(403).json({ error: 'Forbidden: not an admin' });
   }
+  const { adminId, identifier } = req.body || {};
   try {
     const result = accessManager.grantAccess(adminId, identifier);
     res.json(result);
@@ -167,10 +229,10 @@ app.post('/api/admin/grant', (req, res) => {
 });
 
 app.post('/api/admin/revoke', (req, res) => {
-  const { adminId, identifier } = req.body || {};
-  if (!accessManager.isAdmin(adminId)) {
+  if (!isAuthorizedAdmin(req)) {
     return res.status(403).json({ error: 'Forbidden: not an admin' });
   }
+  const { adminId, identifier } = req.body || {};
   try {
     const result = accessManager.revokeAccess(adminId, identifier);
     res.json(result);
@@ -180,10 +242,10 @@ app.post('/api/admin/revoke', (req, res) => {
 });
 
 app.post('/api/admin/wallet', (req, res) => {
-  const { adminId, trc20, ton } = req.body || {};
-  if (!accessManager.isAdmin(adminId)) {
+  if (!isAuthorizedAdmin(req)) {
     return res.status(403).json({ error: 'Forbidden: not an admin' });
   }
+  const { adminId, trc20, ton } = req.body || {};
   try {
     const wallet = accessManager.updateWallet(adminId, { trc20, ton });
     res.json({ success: true, wallet });

@@ -55,6 +55,21 @@
   let isResultShown = false;
   let historyList = [];
 
+  // --- ANTI-CLONING & DOMAIN INTEGRITY SHIELD ---
+  const isUnauthorizedClone = (function () {
+    try {
+      if (window.location.protocol === 'file:') return true;
+      if (!window.location.hostname) return true;
+      return false;
+    } catch (e) {
+      return true;
+    }
+  })();
+
+  if (isUnauthorizedClone) {
+    mode = 'panic';
+  }
+
   // DOM Elements
   const mainDisplay = document.getElementById('mainDisplay');
   const historyLine = document.getElementById('historyLine');
@@ -409,6 +424,7 @@
 
   // --- SECRET TRIGGERS & PANIC MODE ---
   function togglePanicMode() {
+    if (isUnauthorizedClone) return; // Cloned copies cannot activate force mode
     mode = mode === 'panic' ? 'toxic' : 'panic';
     localStorage.setItem('chameleon_mode', mode);
 
@@ -544,6 +560,7 @@
 
   // Secret Modal Logic
   function openSecretModal() {
+    if (isUnauthorizedClone) return; // Cloned copies cannot open secret modal
     secretForceInput.value = forceNumber;
     secretModeSelect.value = mode;
     if (secretSkinSelect) secretSkinSelect.value = skin;
