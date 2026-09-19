@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Калькулятор</title>
+  <meta name="theme-color" content="#1e1f22">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%231e1f22'/%3E%3Ccircle cx='18' cy='18' r='4' fill='%23a8c7fa'/%3E%3Ccircle cx='30' cy='18' r='4' fill='%23a8c7fa'/%3E%3Crect x='14' y='28' width='20' height='4' rx='2' fill='%23a8c7fa'/%3E%3Crect x='14' y='36' width='20' height='4' rx='2' fill='%23a8c7fa'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="calculator-container" id="calculatorApp">
+    <!-- Top Action Bar -->
+    <header class="calc-header">
+      <div class="header-left">
+        <!-- Secret trigger for Panic Mode toggle: double-tap status indicator -->
+        <span class="status-indicator" id="secretStatusSpot" title=""></span>
+      </div>
+      <div class="header-right">
+        <!-- 3-Dots Menu -->
+        <button class="icon-btn" id="menuBtn" aria-label="Меню">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Display Area (Swipe left to backspace) -->
+    <section class="display-area" id="displayArea">
+      <div class="history-preview" id="historyLine"></div>
+      <div class="main-display-container">
+        <span class="main-display" id="mainDisplay">0</span>
+        <span class="cursor" id="blinkingCursor"></span>
+      </div>
+    </section>
+
+    <!-- Scientific Expand Drawer Toggle -->
+    <div class="scientific-toggle-bar" id="scientificToggle">
+      <button class="drawer-pill" id="drawerPillBtn" aria-label="Инженерный калькулятор">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Collapsible Scientific Functions -->
+    <div class="scientific-panel" id="scientificPanel">
+      <div class="sci-row">
+        <button class="btn btn-sci" data-fn="rad">rad</button>
+        <button class="btn btn-sci" data-fn="deg">deg</button>
+        <button class="btn btn-sci" data-fn="sin">sin</button>
+        <button class="btn btn-sci" data-fn="cos">cos</button>
+        <button class="btn btn-sci" data-fn="tan">tan</button>
+      </div>
+      <div class="sci-row">
+        <button class="btn btn-sci" data-fn="inv">inv</button>
+        <button class="btn btn-sci" data-fn="e">e</button>
+        <button class="btn btn-sci" data-fn="ln">ln</button>
+        <button class="btn btn-sci" data-fn="log">log</button>
+        <button class="btn btn-sci" data-fn="sqrt">√</button>
+      </div>
+    </div>
+
+    <!-- Standard Keypad -->
+    <main class="keypad-grid">
+      <!-- Row 1 -->
+      <button class="btn btn-func" id="clearBtn" data-action="clear">AC</button>
+      <button class="btn btn-func" data-action="parens">( )</button>
+      <button class="btn btn-func" data-action="percent">%</button>
+      <button class="btn btn-op" data-op="/">÷</button>
+
+      <!-- Row 2 -->
+      <button class="btn btn-num" data-num="7">7</button>
+      <button class="btn btn-num" data-num="8">8</button>
+      <button class="btn btn-num" data-num="9">9</button>
+      <button class="btn btn-op" data-op="*">×</button>
+
+      <!-- Row 3 -->
+      <button class="btn btn-num" data-num="4">4</button>
+      <button class="btn btn-num" data-num="5">5</button>
+      <button class="btn btn-num" data-num="6">6</button>
+      <button class="btn btn-op" data-op="-">−</button>
+
+      <!-- Row 4 -->
+      <button class="btn btn-num" data-num="1">1</button>
+      <button class="btn btn-num" data-num="2">2</button>
+      <button class="btn btn-num" data-num="3">3</button>
+      <button class="btn btn-op" data-op="+">+</button>
+
+      <!-- Row 5 -->
+      <button class="btn btn-num" data-num="0">0</button>
+      <!-- Secret trigger: Long-press on decimal (.) arms/disarms force -->
+      <button class="btn btn-num" id="dotBtn" data-action="decimal">.</button>
+      <button class="btn btn-func" id="backspaceBtn" data-action="backspace" aria-label="Удалить">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/>
+        </svg>
+      </button>
+      <button class="btn btn-equals" id="equalsBtn" data-action="equals">=</button>
+    </main>
+
+    <!-- Normal 3-dots options menu modal -->
+    <div class="modal-overlay" id="menuModal">
+      <div class="menu-sheet">
+        <div class="menu-item" id="menuHistory">История</div>
+        <div class="menu-item" id="menuTheme">Выбрать тему</div>
+        <div class="menu-item" id="menuFeedback">Отправить отзыв</div>
+        <!-- Secret backdoor: tapping 'Справка' directly opens Secret Settings -->
+        <div class="menu-item" id="menuHelp">Справка</div>
+      </div>
+    </div>
+
+    <!-- Hidden Performer Quick-Launch Modal -->
+    <div class="secret-modal" id="secretConfigModal">
+      <div class="secret-card">
+        <h3>Настройка Chameleon</h3>
+        <p class="secret-room-label">Комната: <span id="currentRoomDisplay">default</span></p>
+        
+        <div class="secret-field">
+          <label>Целевой номер телефона (или число):</label>
+          <input type="tel" id="secretForceInput" placeholder="Например: 89161234567" autocomplete="off">
+          <div class="secret-quick-presets" style="display: flex; gap: 6px; margin-top: 6px;">
+            <button type="button" class="mini-btn" id="presetPrefix8Btn">Начать с 8</button>
+            <button type="button" class="mini-btn" id="presetPrefix7Btn">Начать с 7</button>
+            <button type="button" class="mini-btn" id="presetClearBtn">Очистить</button>
+          </div>
+        </div>
+
+        <div class="secret-field">
+          <label>Внешний вид (Скин телефона):</label>
+          <select id="secretSkinSelect">
+            <option value="android">Google Pixel (Android Material You)</option>
+            <option value="ios">Apple iPhone (iOS 18 Native)</option>
+            <option value="samsung">Samsung Galaxy (One UI)</option>
+          </select>
+        </div>
+
+        <div class="secret-field">
+          <label>Режим работы:</label>
+          <select id="secretModeSelect">
+            <option value="toxic">Toxic 2.0 (Форсирование номера)</option>
+            <option value="time">Time Travel (Точное текущее время)</option>
+            <option value="panic">Обычный калькулятор (Panic Mode)</option>
+          </select>
+        </div>
+
+        <div class="secret-actions">
+          <button id="secretSaveBtn" style="background-color: #a8c7fa; color: #041e49; font-weight: bold; padding: 12px;">СОХРАНИТЬ НОМЕР</button>
+          <button id="secretOpenPerformerBtn">Открыть панель менталиста</button>
+          <button id="secretCloseBtn">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: #000000;
+  color: #2c2c2e;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Bright Setup Mode (Toggleable via sun icon) */
+body.setup-mode {
+  color: #c4c7c5;
+  background-color: #121212;
+}
+
+body.setup-mode .peek-label,
+body.setup-mode .pin-label,
+body.setup-mode .expr-label,
+body.setup-mode .result-label {
+  color: #8ab4f8;
+}
+
+body.setup-mode .captured-pin {
+  color: #ffffff;
+  border-color: #3c4043;
+  background-color: #1e1f22;
+}
+
+body.setup-mode .live-expression,
+body.setup-mode .live-result {
+  color: #e3e3e3;
+  border-color: #3c4043;
+  background-color: #1e1f22;
+}
+
+body.setup-mode .control-card,
+body.setup-mode .room-card {
+  background-color: #1e1f22;
+  border-color: #3c4043;
+}
+
+body.setup-mode input {
+  background-color: #2b2d30;
+  border-color: #484b4f;
+  color: #ffffff;
+}
+
+body.setup-mode .preset-btn {
+  background-color: #2d2f31;
+  color: #c4c7c5;
+}
+
+body.setup-mode .mode-btn {
+  background-color: #2d2f31;
+  color: #c4c7c5;
+}
+
+body.setup-mode .mode-btn.active {
+  background-color: #004a77;
+  color: #c2e7ff;
+}
+
+/* Base Stealth Mode (#000000 and #2c2c2e text) */
+.console-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Header */
+.stealth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.room-tag {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.device-count {
+  font-size: 0.8rem;
+  margin-left: 8px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.stealth-btn {
+  background: transparent;
+  border: 1px solid #222;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* Peek Area */
+.peek-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.peek-label {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.captured-pin-box,
+.live-expr-box,
+.live-result-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pin-label,
+.expr-label,
+.result-label {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+}
+
+.captured-pin {
+  font-size: 3.2rem;
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: 4px;
+  text-align: center;
+  padding: 16px 8px;
+  border: 1px solid #1c1c1e;
+  border-radius: 12px;
+  background-color: #080808;
+  transition: all 0.2s ease;
+}
+
+.live-expression,
+.live-result {
+  font-size: 1.3rem;
+  font-family: monospace;
+  padding: 12px;
+  border: 1px solid #1c1c1e;
+  border-radius: 10px;
+  background-color: #080808;
+  word-break: break-all;
+  min-height: 48px;
+}
+
+/* Control Cards */
+.control-card,
+.room-card {
+  border: 1px solid #1c1c1e;
+  border-radius: 12px;
+  padding: 14px;
+  background-color: #080808;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.mode-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+}
+
+.input-row,
+.room-row {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  flex: 1;
+  background-color: #121214;
+  border: 1px solid #222;
+  color: inherit;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.action-btn {
+  background-color: #1c1c1e;
+  border: 1px solid #333;
+  color: inherit;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.action-btn:active {
+  background-color: #2c2c2e;
+}
+
+/* Preset Buttons */
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.preset-btn {
+  background-color: #121214;
+  border: 1px solid #222;
+  color: inherit;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.preset-btn:active {
+  background-color: #222;
+}
+
+/* Mode Switches */
+.mode-switch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mode-btn {
+  background-color: #121214;
+  border: 1px solid #222;
+  color: inherit;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mode-btn.active {
+  border-color: #444;
+  background-color: #222;
+}
+
+.calc-links {
+  display: flex;
+  gap: 8px;
+}
+
+.link-btn {
+  flex: 1;
+  text-align: center;
+  background-color: #121214;
+  border: 1px solid #222;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* Emergency Fake Notes App Screen */
+.emergency-screen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000;
+  color: #f2f2f2;
+  z-index: 1000;
+  flex-direction: column;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.emergency-screen.active {
+  display: flex;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #e5b332;
+  margin-bottom: 24px;
+}
+
+.notes-back {
+  cursor: pointer;
+}
+
+.notes-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.notes-done {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notes-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notes-timestamp {
+  font-size: 0.8rem;
+  color: #888888;
+  text-align: center;
+}
+
+.notes-body {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #e3e3e3;
+  padding: 12px 0;
+}

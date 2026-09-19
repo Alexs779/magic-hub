@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MAGIC HUB // MENTALIST OS</title>
+  
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- TON Connect UI Standalone -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/hub/style.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    
+    <!-- STRICT LUXURY HEADER -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <div class="brand-monogram">M</div>
+        <div class="brand-text">
+          <span class="brand-title">MAGIC HUB</span>
+          <span class="brand-sub">MENTALIST ECOSYSTEM</span>
+        </div>
+      </div>
+      
+      <div class="header-user-status">
+        <span class="pulse-dot"></span>
+        <span class="user-handle" id="userHandleTag">@operator</span>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="content-container">
+
+      <!-- =======================================================
+           TAB 1: ХАБ ФОКУСОВ (ВИТРИНА И УПРАВЛЕНИЕ)
+           ======================================================= -->
+      <section class="tab-view active" id="view-tricks">
+        
+        <!-- Filter Tabs: Каталог vs Мои трюки -->
+        <div class="catalog-filter-row">
+          <button class="filter-pill active" data-filter="all">ВСЕ ФОКУСЫ (3)</button>
+          <button class="filter-pill" data-filter="owned">МОИ АКТИВНЫЕ (1)</button>
+        </div>
+
+        <!-- 1. CHAMELEON CALCULATOR (АКТИВНЫЙ ФОКУС) -->
+        <div class="glass-card trick-card trick-card-owned" data-trick="calculator">
+          <div class="trick-badge-row">
+            <span class="badge-active"><span class="pulse-dot"></span> КУПЛЕНО // ДОСТУП АКТИВЕН</span>
+            <span class="trick-price-tag">45 USDT</span>
+          </div>
+
+          <div class="trick-header">
+            <div class="trick-title-wrap">
+              <h2>Chameleon Calculator</h2>
+              <span class="trick-subtitle">Эффект: «Звонок в будущее» + Взлом PIN-кода</span>
+            </div>
+            <div class="trick-glyph"><i class="fa-solid fa-calculator"></i></div>
+          </div>
+
+          <!-- Video / Effect Teaser Accordion -->
+          <div class="effect-teaser-box">
+            <div class="teaser-header">
+              <i class="fa-solid fa-play"></i>
+              <strong>ЧТО ВИДИТ ЗРИТЕЛЬ:</strong>
+            </div>
+            <p>Зритель перемножает любые случайные числа на калькуляторе. В финале получается номер телефона. Зритель звонит по нему — и телефон звенит в вашем кармане, у босса на сцене или на телефоне самого зрителя!</p>
+          </div>
+
+          <!-- Quick Control Panel (Unlocked) -->
+          <div class="unlocked-panel">
+            <div class="panel-section-title">
+              <i class="fa-solid fa-sliders"></i>
+              <span>ПАНЕЛЬ НАСТРОЙКИ ФОКУСА</span>
+            </div>
+
+            <!-- Target Phone Number -->
+            <div class="field-box">
+              <div class="field-header">
+                <label>ФОРСИРОВАННЫЙ НОМЕР ДЛЯ ЗВОНКА (=)</label>
+              </div>
+              <div class="input-with-btn">
+                <input type="tel" id="hubForceInput" placeholder="79163428812" autocomplete="off">
+                <button class="save-field-btn" id="hubSaveForceBtn">СОХРАНИТЬ</button>
+              </div>
+              <div class="quick-presets-row">
+                <button type="button" class="chip-btn" id="hubPresetDateBtn">ДАТА</button>
+                <button type="button" class="chip-btn" id="hubPresetTimeBtn">ВРЕМЯ</button>
+                <button type="button" class="chip-btn" id="hubPresetPinBtn">PIN 2580</button>
+              </div>
+            </div>
+
+            <!-- Skin Camouflage Selector -->
+            <div class="field-box">
+              <div class="field-header">
+                <label>КАМУФЛЯЖ ПОД ТЕЛЕФОН ЗРИТЕЛЯ</label>
+              </div>
+              <div class="skin-selector-grid">
+                <button type="button" class="skin-opt-btn active" data-skin="ios">
+                  <i class="fa-brands fa-apple"></i>
+                  <span>Apple iOS 18</span>
+                </button>
+                <button type="button" class="skin-opt-btn" data-skin="android">
+                  <i class="fa-brands fa-android"></i>
+                  <span>Pixel</span>
+                </button>
+                <button type="button" class="skin-opt-btn" data-skin="samsung">
+                  <i class="fa-solid fa-cube"></i>
+                  <span>Samsung</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Primary Action Buttons -->
+            <div class="action-buttons-stack">
+              <button class="primary-action-btn" id="hubCopySpectatorBtn">
+                <i class="fa-solid fa-copy"></i>
+                <span>Скопировать ссылку на Калькулятор (для ярлыка PWA)</span>
+              </button>
+              
+              <div class="split-buttons-row">
+                <button class="secondary-action-btn" id="hubOpenCalcBtn">
+                  <i class="fa-regular fa-clone"></i> Запустить
+                </button>
+                <button class="secondary-action-btn" id="hubOpenPeekBtn">
+                  <i class="fa-solid fa-eye-slash"></i> Stealth Console
+                </button>
+              </div>
+            </div>
+
+            <!-- PWA Guide Banner -->
+            <div class="pwa-guide-strip" id="openPwaGuideModalBtn">
+              <div class="strip-left">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <div>
+                  <strong>Как добавить значок на экран Домой</strong>
+                  <p>Работает на весь экран без рамок браузера и без интернета</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right strip-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. ARTFORCE (SHOWCASE ITEM: МУЗЕЙНЫЙ АРХИВ) -->
+        <div class="glass-card trick-card trick-card-store" data-trick="artforce">
+          <div class="trick-badge-row">
+            <span class="badge-store">ПРЕДЗАКАЗ // ВИТРИНА</span>
+            <span class="trick-price-tag">49 USDT <span style="text-decoration: line-through; opacity: 0.45; font-size: 0.65rem;">79 USDT</span></span>
+          </div>
+
+          <div class="trick-header">
+            <div class="trick-title-wrap">
+              <h2>ArtForce // Музейная Галерея</h2>
+              <span class="trick-subtitle">Эффект: Телепатическое чтение картин</span>
+            </div>
+            <div class="trick-glyph"><i class="fa-solid fa-palette"></i></div>
+          </div>
+
+          <div class="effect-teaser-box">
+            <div class="teaser-header">
+              <i class="fa-solid fa-eye"></i>
+              <strong>ЧТО ВИДИТ ЗРИТЕЛЬ:</strong>
+            </div>
+            <p>Вы открываете на телефоне сайт государственной картинной галереи со 100 мировыми шедеврами. Зритель свободно листает каталог и мысленно загадывает любую картину. Вы с закрытыми глазами за 30 секунд зарисовываете именно её на салфетке!</p>
+          </div>
+
+          <button class="store-preorder-btn" id="openArtforceCheckoutBtn">
+            <i class="fa-solid fa-lock-open"></i> ОФОРМИТЬ ПРЕДЗАКАЗ (49 USDT)
+          </button>
+        </div>
+
+        <!-- 3. SONIC MIND (SHOWCASE ITEM: SPOTIFY ТЕЛЕПАТИЯ) -->
+        <div class="glass-card trick-card trick-card-store" data-trick="sonic">
+          <div class="trick-badge-row">
+            <span class="badge-store">СКОРО В ХАБЕ</span>
+            <span class="trick-price-tag">39 USDT</span>
+          </div>
+
+          <div class="trick-header">
+            <div class="trick-title-wrap">
+              <h2>Sonic Mind // Музыкальные Мысли</h2>
+              <span class="trick-subtitle">Эффект: Угадывание трека в Spotify / Apple Music</span>
+            </div>
+            <div class="trick-glyph"><i class="fa-solid fa-music"></i></div>
+          </div>
+
+          <div class="effect-teaser-box">
+            <div class="teaser-header">
+              <i class="fa-solid fa-headphones"></i>
+              <strong>ЧТО ВИДИТ ЗРИТЕЛЬ:</strong>
+            </div>
+            <p>Зритель на своем или вашем телефоне ищет любую песню своей молодости или любимого исполнителя. Музыка не играет. Менталист напевает мелодию и называет песню вслух!</p>
+          </div>
+
+          <button class="store-secondary-btn" id="notifySonicBtn">
+            <i class="fa-regular fa-bell"></i> УВЕДОМИТЬ О РЕЛИЗЕ
+          </button>
+        </div>
+
+      </section>
+
+      <!-- =======================================================
+           TAB 2: ОБУЧЕНИЕ И СЕКРЕТЫ (MASTERY & ACADEMY)
+           ======================================================= -->
+      <section class="tab-view" id="view-academy">
+        
+        <div class="glass-card academy-intro-card">
+          <div class="academy-header">
+            <span class="passport-tag">MENTALIST ACADEMY</span>
+            <h2>База знаний & Секреты</h2>
+          </div>
+          <p>Пошаговые разборы, психология зрителя, скрипты речи и тонкости показа трюка «Звонок в будущее».</p>
+        </div>
+
+        <!-- Lesson 1 -->
+        <div class="glass-card lesson-card">
+          <div class="lesson-header">
+            <span class="lesson-num">УРОК 01</span>
+            <h3>Психологический скрипт: что сказать зрителю</h3>
+          </div>
+          <div class="lesson-content">
+            <p class="quote-script">
+              «Достаньте телефон или возьмите мой калькулятор. Нажмите случайные цифры: год вашего рождения, любые две цифры из номера квартиры, умножьте на дату сегодняшнего дня. Я не смотрю на экран. Завершите математику...»
+            </p>
+            <p class="lesson-tip"><strong>Правило чистоты:</strong> никогда не берите телефон обратно в руки, когда зритель нажал знак «=». Скажите ему: <em>«Посмотрите на число. Оно похоже на номер телефона? Наберите его прямо сейчас на громкой связи»</em>.</p>
+          </div>
+        </div>
+
+        <!-- Lesson 2 -->
+        <div class="glass-card lesson-card">
+          <div class="lesson-header">
+            <span class="lesson-num">УРОК 02</span>
+            <h3>Вариант «Звонок самому себе» (Парадокс)</h3>
+          </div>
+          <div class="lesson-content">
+            <p>Если вы заранее знаете номер зрителя (с бейджа, визитки или от организаторов), вбейте в Хабе <strong>его личный номер</strong>.</p>
+            <p>Когда зритель нажмет «=» и увидит свой номер, он наберет его — и услышит короткие гудки или свой автоответчик. Это производит в 10 раз более сильный эффект, чем звонок менталисту!</p>
+          </div>
+        </div>
+
+        <!-- Lesson 3 -->
+        <div class="glass-card lesson-card">
+          <div class="lesson-header">
+            <span class="lesson-num">УРОК 03</span>
+            <h3>Взлом PIN-кода карты через Stealth Console</h3>
+          </div>
+          <div class="lesson-content">
+            <p>Попросите зрителя ввести его секретный 4-значный банковский PIN и прибавить к нему любое число, чтобы «зашифровать» его. Исходный PIN за 20 миллисекунд прилетит в вашу <strong>Stealth Console</strong> на втором телефоне или часах!</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =======================================================
+           TAB 3: КАБИНЕТ & TON WALLET (ПРОФИЛЬ И ПАРТНЕРКА)
+           ======================================================= -->
+      <section class="tab-view" id="view-profile">
+
+        <!-- TON Wallet Card -->
+        <div class="glass-card wallet-card">
+          <div class="wallet-header">
+            <div>
+              <span class="passport-tag">USDT DECENTRALIZED SETTLEMENT</span>
+              <h3>USDT Кошелек (TON Connect)</h3>
+            </div>
+            <div class="wallet-icon"><i class="fa-solid fa-wallet"></i></div>
+          </div>
+
+          <p class="wallet-desc">Подключите кошелек Telegram Wallet или Tonkeeper для приема оплат и мгновенных выплат в USDT (Jetton на TON).</p>
+
+          <div class="ton-connect-wrapper">
+            <div id="tonConnectBtn"></div>
+          </div>
+        </div>
+
+        <!-- 30% Partner Affiliate Card -->
+        <div class="glass-card affiliate-card">
+          <div class="affiliate-header">
+            <div>
+              <span class="passport-tag">ROYALTY PROGRAM</span>
+              <h3>Партнерская программа // 30%</h3>
+            </div>
+            <div class="affiliate-badge">30% В USDT</div>
+          </div>
+          <p>Рекомендуйте Magic Hub коллегам-иллюзионистам. С каждой покупки вы получаете <strong>30% (~15 USDT)</strong> мгновенно на свой баланс.</p>
+          
+          <div class="input-with-btn">
+            <input type="text" id="refLinkInput" readonly value="https://t.me/MagicHubBot?start=ref_operator">
+            <button class="save-field-btn" id="copyRefBtn">КОПИЯ</button>
+          </div>
+        </div>
+
+        <!-- Support & Developer Contact -->
+        <div class="glass-card support-card">
+          <div class="support-header">
+            <i class="fa-brands fa-telegram"></i>
+            <div>
+              <h4>Закрытый клуб и поддержка</h4>
+              <p>Техническая поддержка 24/7 и закрытый чат менталистов.</p>
+            </div>
+          </div>
+          <a href="https://t.me/" target="_blank" class="support-link-btn">НАПИСАТЬ В ПОДДЕРЖКУ</a>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- FLOATING FROSTED GLASS CAPSULE (BOTTOM NAVIGATION) -->
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <button class="nav-item active" data-tab="tricks">
+          <div class="nav-icon-box">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="nav-pulse-dot"></span>
+          </div>
+          <span class="nav-label">ХАБ ФОКУСОВ</span>
+        </button>
+
+        <button class="nav-item" data-tab="academy">
+          <div class="nav-icon-box">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span class="nav-pulse-dot"></span>
+          </div>
+          <span class="nav-label">ОБУЧЕНИЕ</span>
+        </button>
+
+        <button class="nav-item" data-tab="profile">
+          <div class="nav-icon-box">
+            <i class="fa-solid fa-user-shield"></i>
+            <span class="nav-pulse-dot"></span>
+          </div>
+          <span class="nav-label">КАБИНЕТ</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- PWA GUIDE MODAL -->
+    <div class="pwa-modal-backdrop" id="pwaModal">
+      <div class="pwa-modal-content">
+        <div class="pwa-modal-header">
+          <div>
+            <span class="passport-tag">PWA STANDALONE SETUP</span>
+            <h3>Как установить значок на экран</h3>
+          </div>
+          <button class="close-modal-btn" id="closePwaModalBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="pwa-modal-body">
+          <div class="pwa-step">
+            <span class="step-badge">1</span>
+            <div>
+              <strong>Для Apple iPhone (Safari):</strong>
+              <p>Откройте ссылку калькулятора в Safari ➔ нажмите кнопку <strong>«Поделиться»</strong> <i class="fa-solid fa-arrow-up-from-bracket"></i> ➔ выберите пункт <strong>«На экран „Домой“»</strong>.</p>
+            </div>
+          </div>
+          <div class="pwa-step">
+            <span class="step-badge">2</span>
+            <div>
+              <strong>Для Android (Chrome):</strong>
+              <p>Откройте ссылку в браузере Chrome ➔ нажмите <strong>три точки (⋮)</strong> в верхнем углу ➔ выберите <strong>«Добавить на главный экран»</strong>.</p>
+            </div>
+          </div>
+          <div class="pwa-benefit-alert">
+            <i class="fa-solid fa-lock"></i>
+            <span>После этого калькулятор запускается на весь экран без адресной строки браузера и работает 100% автономно даже БЕЗ ИНТЕРНЕТА.</span>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKOUT MODAL (SMOKED GLASS) -->
+    <div class="pwa-modal-backdrop" id="checkoutModal">
+      <div class="pwa-modal-content">
+        <div class="pwa-modal-header">
+          <div>
+            <span class="passport-tag">CHECKOUT // ОФОРМЛЕНИЕ ДОСТУПА</span>
+            <h3 id="checkoutTrickTitle">ArtForce // Музейная Галерея</h3>
+          </div>
+          <button class="close-modal-btn" id="closeCheckoutModalBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="checkout-modal-body">
+          <div class="checkout-price-card">
+            <div>
+              <div class="checkout-price-main" id="checkoutPriceMain">49 USDT <span class="checkout-price-sub">// ПРЕДЗАКАЗ (БЫЛО 79 USDT)</span></div>
+            </div>
+            <div class="checkout-discount-badge" id="checkoutDiscountBadge">СКИДКА 40%</div>
+          </div>
+
+          <div class="checkout-features-list">
+            <div class="feature-item">
+              <i class="fa-solid fa-check"></i>
+              <span>Пожизненный доступ к сайту галереи со всеми картинами</span>
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-check"></i>
+              <span>Скрытая телеметрия выбора зрителя в Stealth Console</span>
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-check"></i>
+              <span>Видеоразбор психологических паттернов ментализма</span>
+            </div>
+          </div>
+
+          <div class="checkout-actions-group">
+            <button type="button" class="checkout-btn ton-pay-btn" id="checkoutPayTonBtn">
+              <i class="fa-solid fa-dollar-sign"></i>
+              <span>Оплатить 49 USDT (Telegram Wallet / TON)</span>
+            </button>
+            <button type="button" class="checkout-btn sbp-pay-btn" id="checkoutPaySbpBtn">
+              <i class="fa-solid fa-globe"></i>
+              <span>Оплатить USDT (TRC-20) / Картой РФ</span>
+            </button>
+          </div>
+
+          <p class="checkout-security-note">
+            <i class="fa-solid fa-shield-halved"></i> Мгновенная автоматическая привязка к вашему Telegram ID.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRICT TOAST NOTIFICATION -->
+    <div class="toast-capsule" id="toastCapsule">
+      <i class="fa-solid fa-circle-check toast-icon" id="toastIcon"></i>
+      <span class="toast-text" id="toastText">Уведомление</span>
+    </div>
+
+  </div>
+
+  <script src="/hub/app.js"></script>
+</body>
+</html>

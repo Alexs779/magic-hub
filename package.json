@@ -1,0 +1,25 @@
+{
+  "name": "chameleon-calculator",
+  "version": "1.0.0",
+  "description": "Chameleon Calculator - Android Material You Digital Mentalism Platform",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test --test-force-exit test/*.test.js"
+  },
+  "keywords": [
+    "mentalism",
+    "magic",
+    "calculator",
+    "material-you",
+    "android",
+    "pwa"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  }
+}

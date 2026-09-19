@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Заметки</title>
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="/performer.css">
+</head>
+<body class="stealth-mode">
+  <!-- Emergency / Fail-safe Screen (Fake Notes App) -->
+  <div class="emergency-screen" id="emergencyScreen">
+    <div class="notes-header">
+      <span class="notes-back">‹ Папки</span>
+      <span class="notes-title">Заметки</span>
+      <span class="notes-done" id="exitEmergencyBtn">Готово</span>
+    </div>
+    <div class="notes-content">
+      <div class="notes-timestamp">Изменено: вчера, 18:42</div>
+      <div class="notes-body">
+        Список покупок:<br>
+        - Кофе в зернах<br>
+        - Сыр пармезан<br>
+        - Батарейки AA<br>
+        - Забрать заказ из химчистки
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Performer Stealth Console -->
+  <div class="console-container" id="consoleContainer">
+    <!-- Top Bar with Stealth / Brightness Toggle & Fail-Safe -->
+    <header class="stealth-header">
+      <div class="header-left">
+        <span class="room-tag" id="roomTag">default</span>
+        <span class="device-count" id="deviceCount">● 1 подкл.</span>
+      </div>
+      <div class="header-actions">
+        <button class="stealth-btn" id="stealthModeToggle" title="Яркость экрана">🔆</button>
+        <button class="stealth-btn panic-quick-btn" id="emergencyToggleBtn" title="Аварийный экран">📝</button>
+      </div>
+    </header>
+
+    <!-- LIVE TELEMETRY PEEK AREA -->
+    <section class="peek-area">
+      <div class="peek-label">ПЕРЕХВАТ ВВОДА (LIVE TELEMETRY)</div>
+      
+      <!-- Big Captured PIN / Secret Number Display -->
+      <div class="captured-pin-box">
+        <span class="pin-label">ПОСЛЕДНИЙ ОПЕРАНД / PIN:</span>
+        <div class="captured-pin" id="capturedPinDisplay">----</div>
+      </div>
+
+      <!-- Live Formula Expression -->
+      <div class="live-expr-box">
+        <span class="expr-label">ВЫРАЖЕНИЕ ЗРИТЕЛЯ:</span>
+        <div class="live-expression" id="liveExpressionDisplay">Ожидание зрителя...</div>
+      </div>
+
+      <!-- Result / Force Status -->
+      <div class="live-result-box">
+        <span class="result-label">ИТОГОВЫЙ РЕЗУЛЬТАТ (=):</span>
+        <div class="live-result" id="liveResultDisplay">—</div>
+      </div>
+    </section>
+
+    <!-- CONFIGURATION & CONTROLS -->
+    <section class="controls-area">
+      <!-- Target Force Setup -->
+      <div class="control-card">
+        <div class="card-header">
+          <span>ЦЕЛЕВОЕ ЧИСЛО (TOXIC FORCE)</span>
+          <span class="mode-badge" id="modeBadge">TOXIC АКТИВЕН</span>
+        </div>
+        
+        <div class="input-row">
+          <input type="text" id="targetForceInput" placeholder="79163428812">
+          <button id="updateForceBtn" class="action-btn">Задать</button>
+        </div>
+
+        <!-- Quick Preset Buttons -->
+        <div class="preset-buttons">
+          <button class="preset-btn" id="presetPhoneBtn">Телефон</button>
+          <button class="preset-btn" id="presetDateBtn">Сегодняшняя дата</button>
+          <button class="preset-btn" id="presetTimeBtn">Текущее время</button>
+          <button class="preset-btn" id="presetPinBtn">PIN 2580</button>
+        </div>
+      </div>
+
+      <!-- Remote Skin Switcher for Spectator's Calculator -->
+      <div class="control-card">
+        <div class="card-header">
+          <span>СКИН КАЛЬКУЛЯТОРА ЗРИТЕЛЯ</span>
+          <span class="mode-badge" id="skinBadge">ANDROID</span>
+        </div>
+        <div class="preset-buttons" style="grid-template-columns: repeat(3, 1fr);">
+          <button class="preset-btn active" id="skinAndroidBtn">Google Pixel</button>
+          <button class="preset-btn" id="skinIosBtn">Apple iOS 18</button>
+          <button class="preset-btn" id="skinSamsungBtn">Samsung</button>
+        </div>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="mode-switch-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <button class="mode-btn active" id="modeToxicBtn">Toxic (Форс)</button>
+        <button class="mode-btn" id="modeTimeBtn">Time (Время)</button>
+        <button class="mode-btn" id="modePanicBtn">Panic (Обычный)</button>
+      </div>
+
+      <!-- Quick Room Switcher & QR Link -->
+      <div class="room-card">
+        <div class="room-row">
+          <label for="roomInput">Код сессии:</label>
+          <input type="text" id="roomInput" value="default">
+          <button id="switchRoomBtn" class="action-btn">Сменить</button>
+        </div>
+        <div class="calc-links">
+          <a href="/" target="_blank" class="link-btn" id="openCalcLink">Открыть калькулятор</a>
+          <button class="link-btn" id="copyCalcLinkBtn">Копировать ссылку</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/performer.js"></script>
+</body>
+</html>

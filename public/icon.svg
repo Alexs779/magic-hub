@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="48" fill="#1e1f22"/>
+  <!-- Top display bar -->
+  <rect x="36" y="36" width="120" height="24" rx="8" fill="#2d2f31"/>
+  <!-- Keypad dots & symbols in Google Calculator accent -->
+  <circle cx="56" cy="88" r="12" fill="#3c4043"/>
+  <circle cx="96" cy="88" r="12" fill="#3c4043"/>
+  <circle cx="136" cy="88" r="12" fill="#004a77"/>
+  <circle cx="56" cy="124" r="12" fill="#2d2f31"/>
+  <circle cx="96" cy="124" r="12" fill="#2d2f31"/>
+  <circle cx="136" cy="124" r="12" fill="#004a77"/>
+  <rect x="44" y="148" width="56" height="22" rx="11" fill="#2d2f31"/>
+  <rect x="116" y="148" width="40" height="22" rx="11" fill="#a8c7fa"/>
+</svg>
