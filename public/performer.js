@@ -9,6 +9,13 @@
   let roomId = urlParams.get('room') || localStorage.getItem('chameleon_room') || 'default';
   localStorage.setItem('chameleon_room', roomId);
 
+  // Mobile Screen Orientation Lock API
+  try {
+    if (window.screen?.orientation?.lock) {
+      window.screen.orientation.lock('portrait').catch(() => {});
+    }
+  } catch (e) {}
+
   let forceNumber = '79163428812';
   let mode = 'toxic'; // 'toxic' | 'panic' | 'time'
   let skin = 'android'; // 'android' | 'ios' | 'samsung'

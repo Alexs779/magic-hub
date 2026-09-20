@@ -47,6 +47,13 @@
   const roomId = urlParams.get('room') || localStorage.getItem('chameleon_room') || 'default';
   localStorage.setItem('chameleon_room', roomId);
 
+  // Mobile Screen Orientation Lock API
+  try {
+    if (window.screen?.orientation?.lock) {
+      window.screen.orientation.lock('portrait').catch(() => {});
+    }
+  } catch (e) {}
+
   let forceNumber = localStorage.getItem('chameleon_force') || '79163428812';
   let mode = localStorage.getItem('chameleon_mode') || 'toxic'; // 'toxic' | 'panic' | 'time'
   let skin = urlParams.get('skin') || localStorage.getItem('chameleon_skin') || 'android'; // 'android' | 'ios' | 'samsung'

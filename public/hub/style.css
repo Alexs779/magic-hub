@@ -1097,6 +1097,7 @@ body {
   z-index: 100;
   align-items: flex-end;
   justify-content: center;
+  touch-action: none;
 }
 
 .pwa-modal-backdrop.active {
@@ -1112,23 +1113,33 @@ body {
   border-radius: 28px 28px 0 0;
   width: 100%;
   max-width: 480px;
-  padding: 26px 22px calc(26px + var(--safe-bottom)) 22px;
+  padding: 24px 20px calc(24px + var(--safe-bottom)) 20px;
   animation: strictSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
 .calc-modal-content {
-  max-height: 88vh;
+  height: 85dvh;
+  height: 85vh;
+  max-height: calc(var(--tg-viewport-height, 100dvh) - 44px);
   display: flex;
   flex-direction: column;
-  background: rgba(14, 10, 26, 0.96);
+  overflow: hidden;
+  padding: 20px 18px 0 18px;
+  background: rgba(14, 10, 26, 0.98);
   border-top: 1px solid var(--glass-border-bright);
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(168, 85, 247, 0.15);
 }
 
 .calc-modal-scroll {
-  overflow-y: auto;
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 100%;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(20px + var(--safe-bottom));
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  padding-bottom: calc(56px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -1149,10 +1160,11 @@ body {
 }
 
 .pwa-modal-header {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
 }
 
 .pwa-modal-header h3 {
@@ -1184,6 +1196,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-height: 65dvh;
+  max-height: 65vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(20px + var(--safe-bottom));
 }
 
 .pwa-step {
@@ -1770,4 +1787,95 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+/* =========================================================
+   RESPONSIVE ADAPTIVITY (SMALL & ULTRA-WIDE SCREENS)
+   ========================================================= */
+@media (max-width: 380px) {
+  .quick-presets-row {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .chip-btn {
+    font-size: 0.64rem !important;
+    padding: 7px 4px !important;
+  }
+  .skin-selector-grid {
+    gap: 6px;
+  }
+  .skin-opt-btn {
+    padding: 10px 6px;
+  }
+  .skin-opt-btn span {
+    font-size: 0.66rem;
+  }
+  .compact-trick-header h2 {
+    font-size: 1.02rem;
+  }
+  .primary-action-btn {
+    font-size: 0.86rem;
+    padding: 14px 16px;
+    min-height: 52px;
+  }
+  .secondary-action-btn {
+    font-size: 0.78rem;
+    padding: 12px 8px;
+    min-height: 48px;
+  }
+}
+
+/* =========================================================
+   ORIENTATION GUARD (LOCK TO PORTRAIT ON MOBILE)
+   ========================================================= */
+.orientation-guard {
+  display: none;
+}
+
+@media screen and (orientation: landscape) and (max-height: 520px) {
+  .orientation-guard {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 5, 12, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .orientation-guard-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 360px;
+  }
+
+  .orientation-guard-icon {
+    font-size: 2.8rem;
+    color: var(--cosmic-purple);
+    animation: rotatePhoneAnim 2.2s ease-in-out infinite;
+  }
+
+  .orientation-guard-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+  }
+
+  .orientation-guard-content p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  @keyframes rotatePhoneAnim {
+    0%, 15% { transform: rotate(0deg); }
+    50%, 65% { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
+  }
 }

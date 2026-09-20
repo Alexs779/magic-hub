@@ -101,7 +101,7 @@ body.setup-mode .action-btn {
 .console-container {
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -468,4 +468,47 @@ body.stage-mode .live-result {
   padding: 12px 0;
   letter-spacing: 1px;
   user-select: none;
+}
+
+/* =========================================================
+   ORIENTATION GUARD (LOCK TO PORTRAIT ON MOBILE)
+   ========================================================= */
+.orientation-guard {
+  display: none;
+}
+
+@media screen and (orientation: landscape) and (max-height: 520px) {
+  .orientation-guard {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    color: #ffffff;
+  }
+
+  .orientation-guard-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .orientation-icon {
+    font-size: 2.5rem;
+  }
+
+  .orientation-guard-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .orientation-guard-content p {
+    font-size: 0.8rem;
+    color: #888888;
+  }
 }

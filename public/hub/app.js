@@ -7,16 +7,46 @@
 (function () {
   'use strict';
 
-  // --- TELEGRAM WEBAPP INITIALIZATION ---
+  // --- TELEGRAM WEBAPP & ORIENTATION INITIALIZATION ---
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.ready();
     tg.expand();
     try {
-      tg.headerColor = '#000000';
-      tg.backgroundColor = '#000000';
+      tg.headerColor = '#06050c';
+      tg.backgroundColor = '#06050c';
+      // Disable vertical swipe-to-close so modal scrolling works reliably
+      if (typeof tg.disableVerticalSwipes === 'function') {
+        tg.disableVerticalSwipes();
+      }
+      // Lock orientation to portrait if supported by Telegram client
+      if (typeof tg.lockOrientation === 'function') {
+        tg.lockOrientation();
+      }
     } catch (e) {}
+
+    // Track dynamic viewport height to prevent keyboard / bottom clipping
+    const updateViewportHeight = () => {
+      const vh = tg.viewportHeight || window.innerHeight;
+      document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
+    };
+    updateViewportHeight();
+    tg.onEvent?.('viewportChanged', updateViewportHeight);
+    window.addEventListener('resize', updateViewportHeight);
+  } else {
+    const updateViewportHeight = () => {
+      document.documentElement.style.setProperty('--tg-viewport-height', `${window.innerHeight}px`);
+    };
+    updateViewportHeight();
+    window.addEventListener('resize', updateViewportHeight);
   }
+
+  // Mobile Screen Orientation Lock API
+  try {
+    if (window.screen?.orientation?.lock) {
+      window.screen.orientation.lock('portrait').catch(() => {});
+    }
+  } catch (e) {}
 
   // --- TACTILE STEALTH HAPTIC ENGINE ---
   function triggerHaptic(type = 'light') {
