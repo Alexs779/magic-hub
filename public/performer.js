@@ -232,11 +232,12 @@
 
   // --- BUTTON HANDLERS ---
   updateForceBtn?.addEventListener('click', () => {
-    const val = targetForceInput.value.trim();
+    const val = targetForceInput.value.trim().replace(/[\s\-\(\)\+]/g, '');
     if (val) {
       forceNumber = val;
       setModeUI('toxic');
       sendConfig(forceNumber, 'toxic', skin);
+      detectPresetByForce(forceNumber, 'toxic');
       triggerHapticAlert('input');
     }
   });
@@ -312,7 +313,7 @@
     } else if (val === '147') {
       setActivePresetUI(presetBookBtn, '📖 КНИГА 147');
     } else {
-      setActivePresetUI(null, 'ФОРС АКТИВЕН');
+      setActivePresetUI(null, '⚡ СВОЕ ЧИСЛО');
     }
   }
 

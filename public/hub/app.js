@@ -198,6 +198,37 @@
 
   // --- PRESET TRACKING & ACTIVE UI ---
   let userPhone = localStorage.getItem('hub_user_phone') || '79163428812';
+  const hubForceLabel = document.getElementById('hubForceLabel');
+
+  function updateForceLabelAndPlaceholder(presetType, val) {
+    if (!hubForceLabel || !hubForceInput) return;
+    switch(presetType) {
+      case 'phone':
+        hubForceLabel.textContent = '📞 НОМЕР ДЛЯ ЗВОНКА (=)';
+        hubForceInput.placeholder = userPhone || '79163428812';
+        break;
+      case 'date':
+        hubForceLabel.textContent = '📅 СЕКРЕТНАЯ ДАТА (=)';
+        hubForceInput.placeholder = 'ДДММ (напр. 2009)';
+        break;
+      case 'time':
+        hubForceLabel.textContent = '⏰ ТЕКУЩЕЕ ВРЕМЯ (=)';
+        hubForceInput.placeholder = 'ЧЧММ (напр. 2054)';
+        break;
+      case 'pin':
+        hubForceLabel.textContent = '🔑 ЗАГАДАННЫЙ PIN (=)';
+        hubForceInput.placeholder = '2580';
+        break;
+      case 'book':
+        hubForceLabel.textContent = '📖 СТРАНИЦА КНИГИ (=)';
+        hubForceInput.placeholder = '147';
+        break;
+      default:
+        hubForceLabel.textContent = 'СЕКРЕТНЫЙ РЕЗУЛЬТАТ (=)';
+        hubForceInput.placeholder = 'Свое число форсирования...';
+        break;
+    }
+  }
 
   function setActiveChipBtn(activeId) {
     document.querySelectorAll('.quick-presets-row .chip-btn').forEach(b => {
@@ -215,20 +246,32 @@
     const mins = String(d.getMinutes()).padStart(2, '0');
     const currentTime = `${hours}${mins}`;
 
-    if (val === userPhone || val.length >= 10) {
+    if (val === userPhone || (val && val.length >= 10)) {
       setActiveChipBtn('hubPresetPhoneBtn');
+      updateForceLabelAndPlaceholder('phone', val);
     } else if (val === todayDate) {
       setActiveChipBtn('hubPresetDateBtn');
+      updateForceLabelAndPlaceholder('date', val);
     } else if (val === currentTime) {
       setActiveChipBtn('hubPresetTimeBtn');
+      updateForceLabelAndPlaceholder('time', val);
     } else if (val === '2580') {
       setActiveChipBtn('hubPresetPinBtn');
+      updateForceLabelAndPlaceholder('pin', val);
     } else if (val === '147') {
       setActiveChipBtn('hubPresetBookBtn');
+      updateForceLabelAndPlaceholder('book', val);
     } else {
       setActiveChipBtn(null);
+      updateForceLabelAndPlaceholder('custom', val);
     }
   }
+
+  // Live input tracking to detect preset on typing
+  hubForceInput?.addEventListener('input', () => {
+    const val = hubForceInput.value.trim().replace(/[\s\-\(\)\+]/g, '');
+    detectActivePreset(val);
+  });
 
   // --- TRICK SETTINGS (CHAMELEON CALCULATOR) ---
   function applyAndSaveForce(val, feedbackType = 'rigid', toastMsg = null) {
@@ -239,17 +282,19 @@
     saveConfigToServer(forceNumber, skin, mode);
     detectActivePreset(val);
     triggerHaptic(feedbackType);
-    showToast(toastMsg || `Число сохранено: ${val}`);
+    showToast(toastMsg || `Секретный результат сохранен: ${val}`);
   }
 
   hubSaveForceBtn?.addEventListener('click', () => {
     const val = hubForceInput.value.trim().replace(/[\s\-\(\)\+]/g, '');
     if (val) {
+      let msg = `Секретный результат сохранен: ${val}`;
       if (val.length >= 10) {
         userPhone = val;
         localStorage.setItem('hub_user_phone', userPhone);
+        msg = `📞 Номер для звонка сохранен: ${val}`;
       }
-      applyAndSaveForce(val, 'success');
+      applyAndSaveForce(val, 'success', msg);
 
       const origText = hubSaveForceBtn.textContent;
       hubSaveForceBtn.textContent = 'OK';
@@ -267,32 +312,39 @@
   document.getElementById('hubPresetPhoneBtn')?.addEventListener('click', () => {
     applyAndSaveForce(userPhone, 'rigid', 'Выбран сценарий: 📞 Звонок в будущее');
     setActiveChipBtn('hubPresetPhoneBtn');
+    updateForceLabelAndPlaceholder('phone', userPhone);
   });
 
   document.getElementById('hubPresetDateBtn')?.addEventListener('click', () => {
     const d = new Date();
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
-    applyAndSaveForce(`${day}${month}`, 'rigid', 'Выбран сценарий: 📅 Дата');
+    const val = `${day}${month}`;
+    applyAndSaveForce(val, 'rigid', 'Выбран сценарий: 📅 Дата');
     setActiveChipBtn('hubPresetDateBtn');
+    updateForceLabelAndPlaceholder('date', val);
   });
 
   document.getElementById('hubPresetTimeBtn')?.addEventListener('click', () => {
     const d = new Date();
     const hours = String(d.getHours()).padStart(2, '0');
     const mins = String(d.getMinutes()).padStart(2, '0');
-    applyAndSaveForce(`${hours}${mins}`, 'rigid', 'Выбран сценарий: ⏰ Время');
+    const val = `${hours}${mins}`;
+    applyAndSaveForce(val, 'rigid', 'Выбран сценарий: ⏰ Время');
     setActiveChipBtn('hubPresetTimeBtn');
+    updateForceLabelAndPlaceholder('time', val);
   });
 
   document.getElementById('hubPresetPinBtn')?.addEventListener('click', () => {
     applyAndSaveForce('2580', 'rigid', 'Выбран сценарий: 🔑 PIN 2580');
     setActiveChipBtn('hubPresetPinBtn');
+    updateForceLabelAndPlaceholder('pin', '2580');
   });
 
   document.getElementById('hubPresetBookBtn')?.addEventListener('click', () => {
     applyAndSaveForce('147', 'rigid', 'Выбран сценарий: 📖 Книга 147');
     setActiveChipBtn('hubPresetBookBtn');
+    updateForceLabelAndPlaceholder('book', '147');
   });
 
   // Initial detection

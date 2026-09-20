@@ -121,12 +121,15 @@
         <p class="secret-room-label">Комната: <span id="currentRoomDisplay">default</span></p>
         
         <div class="secret-field">
-          <label>Целевой номер телефона (или число):</label>
-          <input type="tel" id="secretForceInput" placeholder="Например: 89161234567" autocomplete="off">
-          <div class="secret-quick-presets" style="display: flex; gap: 6px; margin-top: 6px;">
-            <button type="button" class="mini-btn" id="presetPrefix8Btn">Начать с 8</button>
-            <button type="button" class="mini-btn" id="presetPrefix7Btn">Начать с 7</button>
-            <button type="button" class="mini-btn" id="presetClearBtn">Очистить</button>
+          <label>Секретный результат (=):</label>
+          <input type="tel" id="secretForceInput" placeholder="Например: 79163428812" autocomplete="off">
+          <div class="secret-quick-presets" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px;">
+            <button type="button" class="mini-btn" id="secretPresetPhoneBtn">📞 Телефон</button>
+            <button type="button" class="mini-btn" id="secretPresetDateBtn">📅 Дата</button>
+            <button type="button" class="mini-btn" id="secretPresetTimeBtn">⏰ Время</button>
+            <button type="button" class="mini-btn" id="secretPresetPinBtn">🔑 PIN</button>
+            <button type="button" class="mini-btn" id="secretPresetBookBtn">📖 Книга</button>
+            <button type="button" class="mini-btn" id="secretPresetClearBtn">Очистить</button>
           </div>
         </div>
 
@@ -142,14 +145,14 @@
         <div class="secret-field">
           <label>Режим работы:</label>
           <select id="secretModeSelect">
-            <option value="toxic">Toxic 2.0 (Форсирование номера)</option>
+            <option value="toxic">Toxic 2.0 (Секретное число / 5-в-1)</option>
             <option value="time">Time Travel (Точное текущее время)</option>
             <option value="panic">Обычный калькулятор (Panic Mode)</option>
           </select>
         </div>
 
         <div class="secret-actions">
-          <button id="secretSaveBtn" style="background-color: #a8c7fa; color: #041e49; font-weight: bold; padding: 12px;">СОХРАНИТЬ НОМЕР</button>
+          <button id="secretSaveBtn" style="background-color: #a8c7fa; color: #041e49; font-weight: bold; padding: 12px;">СОХРАНИТЬ НАСТРОЙКИ</button>
           <button id="secretOpenPerformerBtn">Открыть панель менталиста</button>
           <button id="secretCloseBtn">Закрыть</button>
         </div>

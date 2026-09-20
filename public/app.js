@@ -584,24 +584,51 @@
   secretCloseBtn.addEventListener('click', closeSecretModal);
 
   // Quick preset helper buttons in Secret Modal
-  const presetPrefix8Btn = document.getElementById('presetPrefix8Btn');
-  const presetPrefix7Btn = document.getElementById('presetPrefix7Btn');
-  const presetClearBtn = document.getElementById('presetClearBtn');
+  const secretPresetPhoneBtn = document.getElementById('secretPresetPhoneBtn');
+  const secretPresetDateBtn = document.getElementById('secretPresetDateBtn');
+  const secretPresetTimeBtn = document.getElementById('secretPresetTimeBtn');
+  const secretPresetPinBtn = document.getElementById('secretPresetPinBtn');
+  const secretPresetBookBtn = document.getElementById('secretPresetBookBtn');
+  const secretPresetClearBtn = document.getElementById('secretPresetClearBtn');
 
-  if (presetPrefix8Btn) {
-    presetPrefix8Btn.addEventListener('click', () => {
-      secretForceInput.value = '89';
+  if (secretPresetPhoneBtn) {
+    secretPresetPhoneBtn.addEventListener('click', () => {
+      secretForceInput.value = localStorage.getItem('hub_user_phone') || '79163428812';
       secretForceInput.focus();
     });
   }
-  if (presetPrefix7Btn) {
-    presetPrefix7Btn.addEventListener('click', () => {
-      secretForceInput.value = '79';
+  if (secretPresetDateBtn) {
+    secretPresetDateBtn.addEventListener('click', () => {
+      const d = new Date();
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      secretForceInput.value = `${day}${month}`;
       secretForceInput.focus();
     });
   }
-  if (presetClearBtn) {
-    presetClearBtn.addEventListener('click', () => {
+  if (secretPresetTimeBtn) {
+    secretPresetTimeBtn.addEventListener('click', () => {
+      const d = new Date();
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      secretForceInput.value = `${hours}${mins}`;
+      secretForceInput.focus();
+    });
+  }
+  if (secretPresetPinBtn) {
+    secretPresetPinBtn.addEventListener('click', () => {
+      secretForceInput.value = '2580';
+      secretForceInput.focus();
+    });
+  }
+  if (secretPresetBookBtn) {
+    secretPresetBookBtn.addEventListener('click', () => {
+      secretForceInput.value = '147';
+      secretForceInput.focus();
+    });
+  }
+  if (secretPresetClearBtn) {
+    secretPresetClearBtn.addEventListener('click', () => {
       secretForceInput.value = '';
       secretForceInput.focus();
     });
