@@ -431,12 +431,22 @@
 
   document.getElementById('hubOpenCalcBtn')?.addEventListener('click', () => {
     triggerHaptic('medium');
-    window.open(getSpectatorUrl(), '_blank');
+    const url = getSpectatorUrl();
+    if (tg?.openLink) {
+      tg.openLink(url);
+    } else {
+      window.open(url, '_blank');
+    }
   });
 
   document.getElementById('hubOpenPeekBtn')?.addEventListener('click', () => {
     triggerHaptic('medium');
-    window.open(getPeekUrl(), '_blank');
+    const url = getPeekUrl();
+    if (tg?.openLink) {
+      tg.openLink(url);
+    } else {
+      window.open(url, '_blank');
+    }
   });
 
   // --- TON CONNECT UI INITIALIZATION ---
@@ -508,7 +518,8 @@
     if (!tg?.BackButton) return;
     const anyModalOpen = pwaModal?.classList.contains('active') || 
                          calcModal?.classList.contains('active') ||
-                         buyAccessModal?.classList.contains('active');
+                         buyAccessModal?.classList.contains('active') ||
+                         simulatorModal?.classList.contains('active');
     if (anyModalOpen) {
       tg.BackButton.show();
       tg.BackButton.onClick(closeAllModals);
@@ -521,8 +532,151 @@
     pwaModal?.classList.remove('active');
     calcModal?.classList.remove('active');
     buyAccessModal?.classList.remove('active');
+    if (simulatorModal?.classList.contains('active')) {
+      closeSimulator();
+    }
     updateTgBackButton();
   }
+
+  // --- SIMULATOR CONTROLLER (1-SCREEN TEST-DRIVE) ---
+  const hubOpenSimulatorBtn = document.getElementById('hubOpenSimulatorBtn');
+  const simulatorModal = document.getElementById('simulatorModal');
+  const closeSimulatorBtn = document.getElementById('closeSimulatorBtn');
+  const simulatorIframe = document.getElementById('simulatorIframe');
+  const simCapturedPin = document.getElementById('simCapturedPin');
+  const simResult = document.getElementById('simResult');
+  const simLiveExpression = document.getElementById('simLiveExpression');
+  const simPresetPhone = document.getElementById('simPresetPhone');
+  const simPresetDate = document.getElementById('simPresetDate');
+  const simPresetTime = document.getElementById('simPresetTime');
+  const simPresetPin = document.getElementById('simPresetPin');
+  const simPresetClean = document.getElementById('simPresetClean');
+
+  let simWs = null;
+
+  function connectSimWs() {
+    if (simWs) {
+      try { simWs.close(); } catch(e) {}
+    }
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}?room=${encodeURIComponent(roomId)}&role=performer`;
+    simWs = new WebSocket(wsUrl);
+
+    simWs.onmessage = (evt) => {
+      try {
+        const msg = JSON.parse(evt.data);
+        if (msg.type === 'telemetry') {
+          const data = msg.payload;
+          if (data.expression || data.currentInput !== undefined) {
+            const expr = (data.expression || '') + (data.currentInput !== undefined ? data.currentInput : '');
+            if (simLiveExpression) simLiveExpression.textContent = expr || 'Ожидание ввода...';
+          }
+          if (data.capturedOperand) {
+            if (simCapturedPin) simCapturedPin.textContent = data.capturedOperand;
+          } else if (data.capturedFinalOperand) {
+            if (simCapturedPin) simCapturedPin.textContent = data.capturedFinalOperand;
+          }
+          if (data.event === 'calculate') {
+            if (simResult) simResult.textContent = `${data.result} ${data.wasForced ? '(ФОРС)' : '(ТОЧНО)'}`;
+          } else if (data.event === 'clear' || data.event === 'reset') {
+            if (simResult) simResult.textContent = '—';
+          }
+        }
+      } catch (e) {}
+    };
+  }
+
+  function openSimulator() {
+    triggerHaptic('medium');
+    pwaModal?.classList.remove('active');
+    calcModal?.classList.remove('active');
+    buyAccessModal?.classList.remove('active');
+    if (simulatorModal) simulatorModal.classList.add('active');
+    if (simulatorIframe) simulatorIframe.src = getSpectatorUrl();
+    if (simCapturedPin) simCapturedPin.textContent = '----';
+    if (simResult) simResult.textContent = '—';
+    if (simLiveExpression) simLiveExpression.textContent = 'Нажимайте кнопки на калькуляторе ниже...';
+    connectSimWs();
+    updateTgBackButton();
+  }
+
+  function closeSimulator() {
+    triggerHaptic('light');
+    if (simulatorModal) simulatorModal.classList.remove('active');
+    if (simulatorIframe) simulatorIframe.src = 'about:blank';
+    if (simWs) {
+      try { simWs.close(); } catch(e) {}
+      simWs = null;
+    }
+    updateTgBackButton();
+  }
+
+  hubOpenSimulatorBtn?.addEventListener('click', openSimulator);
+  closeSimulatorBtn?.addEventListener('click', closeSimulator);
+
+  function sendSimConfig(newForce, newMode) {
+    if (simWs && simWs.readyState === WebSocket.OPEN) {
+      simWs.send(JSON.stringify({
+        type: 'set_config',
+        payload: {
+          forceNumber: newForce !== undefined ? newForce : forceNumber,
+          mode: newMode !== undefined ? newMode : mode,
+          skin: skin
+        }
+      }));
+    }
+    saveConfigToServer(newForce, skin, newMode);
+  }
+
+  function setSimActivePreset(activeBtn) {
+    document.querySelectorAll('.sim-presets-row .sim-preset-btn').forEach(b => b.classList.remove('active'));
+    if (activeBtn) activeBtn.classList.add('active');
+  }
+
+  simPresetPhone?.addEventListener('click', () => {
+    forceNumber = localStorage.getItem('hub_user_phone') || '79163428812';
+    mode = 'toxic';
+    setSimActivePreset(simPresetPhone);
+    sendSimConfig(forceNumber, mode);
+    triggerHaptic('rigid');
+  });
+
+  simPresetDate?.addEventListener('click', () => {
+    const d = new Date();
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    forceNumber = `${day}${month}`;
+    mode = 'toxic';
+    setSimActivePreset(simPresetDate);
+    sendSimConfig(forceNumber, mode);
+    triggerHaptic('rigid');
+  });
+
+  simPresetTime?.addEventListener('click', () => {
+    const d = new Date();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    forceNumber = `${hours}${minutes}`;
+    mode = 'toxic';
+    setSimActivePreset(simPresetTime);
+    sendSimConfig(forceNumber, mode);
+    triggerHaptic('rigid');
+  });
+
+  simPresetPin?.addEventListener('click', () => {
+    forceNumber = '2580';
+    mode = 'toxic';
+    setSimActivePreset(simPresetPin);
+    sendSimConfig(forceNumber, mode);
+    triggerHaptic('rigid');
+  });
+
+  simPresetClean?.addEventListener('click', () => {
+    mode = 'panic';
+    setSimActivePreset(simPresetClean);
+    sendSimConfig(forceNumber, mode);
+    triggerHaptic('medium');
+  });
 
   // --- BUY ACCESS MODAL ---
   function openBuyModal() {

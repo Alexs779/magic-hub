@@ -97,6 +97,16 @@
   const currentRoomDisplay = document.getElementById('currentRoomDisplay');
   const drawerPillBtn = document.getElementById('drawerPillBtn');
   const scientificPanel = document.getElementById('scientificPanel');
+  const stealthSoloPeek = document.getElementById('stealthSoloPeek');
+  let lastCapturedSecret = null;
+
+  function updateStealthSoloPeek(val) {
+    if (!val || val === '0') return;
+    lastCapturedSecret = val;
+    if (stealthSoloPeek) {
+      stealthSoloPeek.textContent = `• ${val}`;
+    }
+  }
 
   function applySkin(skinName) {
     skin = ['android', 'ios', 'samsung'].includes(skinName) ? skinName : 'android';
@@ -293,6 +303,7 @@
     }
 
     const capturedOperand = currentInput;
+    updateStealthSoloPeek(capturedOperand);
 
     if (isResultShown) {
       expression = `${currentInput} ${displayOp} `;
@@ -358,6 +369,7 @@
 
     const fullExpr = expression + currentInput;
     const capturedFinalOperand = currentInput;
+    updateStealthSoloPeek(capturedFinalOperand);
 
     if (!expression && !isResultShown) {
       return;
@@ -681,18 +693,41 @@
   // --- TOUCH GESTURE: SWIPE ON DISPLAY (LEFT: BACKSPACE, RIGHT: SECRET TOGGLE) ---
   let touchStartX = 0;
   let touchStartY = 0;
+  let displayPressTimer = null;
+  let isFlashingSoloPeek = false;
+
+  function triggerSoloFlashPeek() {
+    if (!lastCapturedSecret || isFlashingSoloPeek) return;
+    isFlashingSoloPeek = true;
+    triggerHaptic('arm');
+
+    const originalDisplay = mainDisplay.textContent;
+    mainDisplay.textContent = `[ ${lastCapturedSecret} ]`;
+    mainDisplay.style.color = '#c084fc';
+
+    setTimeout(() => {
+      mainDisplay.textContent = originalDisplay;
+      mainDisplay.style.color = '';
+      isFlashingSoloPeek = false;
+    }, 1200);
+  }
 
   displayArea.addEventListener('touchstart', (e) => {
     if (e.touches.length === 1) {
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      displayPressTimer = setTimeout(triggerSoloFlashPeek, 550);
     }
   }, { passive: true });
 
   displayArea.addEventListener('touchend', (e) => {
+    if (displayPressTimer) clearTimeout(displayPressTimer);
     if (e.changedTouches.length === 1) {
       const diffX = e.changedTouches[0].clientX - touchStartX;
       const diffY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+      if (Math.abs(diffX) > 20 || diffY > 20) {
+        if (displayPressTimer) clearTimeout(displayPressTimer);
+      }
       // Horizontal swipe left of at least 35px: Backspace
       if (diffX < -35 && diffY < 45) {
         backspace();
@@ -702,6 +737,10 @@
       }
     }
   }, { passive: true });
+
+  displayArea.addEventListener('touchcancel', () => {
+    if (displayPressTimer) clearTimeout(displayPressTimer);
+  });
 
   // --- KEYPAD BUTTON DELEGATION ---
   let lastClearTapTime = 0;

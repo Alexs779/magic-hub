@@ -604,3 +604,24 @@ body.skin-samsung .btn-equals {
     font-size: 1.1rem !important;
   }
 }
+
+/* In-Calculator Stealth Solo Peek (Invisible to spectator, visible to performer up close) */
+.stealth-solo-peek {
+  position: absolute;
+  bottom: 6px;
+  left: 12px;
+  font-family: monospace;
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  letter-spacing: 0.5px;
+  user-select: none;
+  z-index: 5;
+  transition: opacity 0.2s ease;
+}
+
+body.skin-ios .stealth-solo-peek {
+  bottom: 8px;
+  left: 16px;
+  color: rgba(255, 255, 255, 0.08);
+}

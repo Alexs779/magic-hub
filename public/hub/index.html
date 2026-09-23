@@ -144,6 +144,9 @@
               <div style="padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border-left: 3px solid #eab308;">
                 <strong style="color: #fff;">Тап 2 пальцами в Stealth Console:</strong> Аварийная маскировка под «Заметки со списком покупок».
               </div>
+              <div style="padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border-left: 3px solid #ec4899;">
+                <strong style="color: #fff;">Соло-подсмотр на 1 телефоне (Удержание экрана 500 мс):</strong> Если у вас нет второго телефона — зажмите табло на 0.5с: калькулятор на 1.2 сек покажет перехваченный PIN. Также в углу табло виден микро-индикатор.
+              </div>
             </div>
           </div>
         </div>
@@ -481,6 +484,12 @@
                 <i class="fa-solid fa-eye-slash"></i> Stealth Console
               </button>
             </div>
+
+            <!-- Single-Screen Simulator (Test-Drive) -->
+            <button class="primary-action-btn test-drive-btn" id="hubOpenSimulatorBtn" style="background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(59,130,246,0.25)); border: 1px solid rgba(168,85,247,0.4); margin-top: 8px;">
+              <i class="fa-solid fa-gamepad" style="color: #c084fc;"></i>
+              <span>🎮 ТЕСТ-ДРАЙВ (Симулятор с одного экрана)</span>
+            </button>
           </div>
 
           <!-- PWA Guide Banner -->
@@ -593,6 +602,52 @@
             </div>
             <div class="buy-status-info" id="buyStatusInfo" style="display: none;"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         INTERACTIVE SIMULATOR (TEST-DRIVE ON ONE SCREEN)
+         ========================================================= -->
+    <div class="simulator-modal-backdrop" id="simulatorModal">
+      <div class="simulator-modal-container">
+        <!-- Floating Performer HUD on Top -->
+        <div class="simulator-hud" id="simulatorHud">
+          <div class="sim-hud-top">
+            <div class="sim-hud-badge">🎮 ТЕСТ-ДРАЙВ (1 ЭКРАН)</div>
+            <div class="sim-hud-live-tag" id="simLiveTag">● LIVE STREAM</div>
+            <button type="button" class="sim-close-btn" id="closeSimulatorBtn">✕ ЗАКРЫТЬ</button>
+          </div>
+
+          <div class="sim-hud-peek-row">
+            <div class="sim-peek-box">
+              <span class="sim-label">ПЕРЕХВАТ (PIN):</span>
+              <span class="sim-val-hero" id="simCapturedPin">----</span>
+            </div>
+            <div class="sim-peek-box">
+              <span class="sim-label">ФИНАЛ (=):</span>
+              <span class="sim-val-result" id="simResult">—</span>
+            </div>
+          </div>
+
+          <div class="sim-hud-formula-row">
+            <span class="sim-label">РАСЧЕТ:</span>
+            <span class="sim-val-expr" id="simLiveExpression">Нажимайте кнопки на калькуляторе ниже...</span>
+          </div>
+
+          <!-- Quick Presets Row in Simulator -->
+          <div class="sim-presets-row">
+            <button type="button" class="sim-preset-btn active" data-sim-preset="phone" id="simPresetPhone">📞 Тел</button>
+            <button type="button" class="sim-preset-btn" data-sim-preset="date" id="simPresetDate">📅 Дата</button>
+            <button type="button" class="sim-preset-btn" data-sim-preset="time" id="simPresetTime">⏰ Время</button>
+            <button type="button" class="sim-preset-btn" data-sim-preset="pin" id="simPresetPin">🔑 PIN</button>
+            <button type="button" class="sim-preset-btn" data-sim-preset="clean" id="simPresetClean">🛡️ Чистый</button>
+          </div>
+        </div>
+
+        <!-- Embedded Interactive Calculator Iframe -->
+        <div class="simulator-iframe-wrap">
+          <iframe class="simulator-iframe" id="simulatorIframe" src="about:blank" title="Калькулятор Зрителя"></iframe>
         </div>
       </div>
     </div>
