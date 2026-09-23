@@ -109,6 +109,13 @@ app.post('/api/user/config', (req, res) => {
 
 const accessManager = require('./lib/access-manager');
 
+// Initialize cloud database asynchronously (if DATABASE_URL is configured)
+if (typeof accessManager.initDatabase === 'function') {
+  accessManager.initDatabase().catch(err => {
+    console.warn('[Server] DB init notice:', err.message);
+  });
+}
+
 app.get('/hub', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'hub', 'index.html'));
 });

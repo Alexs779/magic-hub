@@ -7,125 +7,74 @@
 
 body {
   background-color: #000000;
-  color: #2c2c2e;
+  color: #e2e8f0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
+  user-select: none;
   transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-/* Bright Setup Mode (Toggleable via sun icon) - Midnight Linear Style */
+/* High Contrast / Bright Mode */
 body.setup-mode {
-  color: #f3e8ff;
   background-color: #080612;
   background-image: 
-    radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.14) 0%, transparent 50%),
-    radial-gradient(circle at 15% 85%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.16) 0%, transparent 50%),
+    radial-gradient(circle at 15% 85%, rgba(99, 102, 241, 0.12) 0%, transparent 50%);
   background-attachment: fixed;
 }
 
-body.setup-mode .peek-label,
-body.setup-mode .pin-label,
-body.setup-mode .expr-label,
-body.setup-mode .result-label {
-  color: #c084fc;
-}
-
-body.setup-mode .captured-pin {
-  color: #ffffff;
-  border-color: rgba(168, 85, 247, 0.35);
-  background-color: rgba(22, 16, 38, 0.85);
-  box-shadow: 0 0 24px rgba(168, 85, 247, 0.2);
-}
-
-body.setup-mode .live-expression,
-body.setup-mode .live-result {
-  color: #f3e8ff;
-  border-color: rgba(168, 85, 247, 0.25);
-  background-color: rgba(22, 16, 38, 0.85);
-}
-
-body.setup-mode .control-card,
-body.setup-mode .room-card {
-  background-color: rgba(22, 16, 38, 0.7);
-  border-color: rgba(168, 85, 247, 0.22);
-  backdrop-filter: blur(20px);
-}
-
-body.setup-mode input {
-  background-color: rgba(10, 7, 18, 0.85);
-  border-color: rgba(168, 85, 247, 0.3);
-  color: #ffffff;
-}
-
-body.setup-mode input:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
-}
-
-body.setup-mode .preset-btn {
-  background-color: rgba(168, 85, 247, 0.08);
-  border-color: rgba(168, 85, 247, 0.2);
-  color: #f3e8ff;
-}
-
-body.setup-mode .preset-btn.active {
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-  border-color: #a855f7;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
-}
-
-body.setup-mode .mode-btn {
-  background-color: rgba(168, 85, 247, 0.08);
-  border-color: rgba(168, 85, 247, 0.2);
-  color: #f3e8ff;
-}
-
-body.setup-mode .mode-btn.active {
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-  border-color: #a855f7;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
-}
-
-body.setup-mode .action-btn {
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-  color: #ffffff;
-  border: none;
-  box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
-}
-
-/* Base Stealth Mode (#000000 and #2c2c2e text) */
+/* Main Container */
 .console-container {
   max-width: 480px;
   margin: 0 auto;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* Header */
+/* Minimalist Stealth Header */
 .stealth-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #1a1a1a;
+  padding: 4px 0 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.status-dot.online {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
 }
 
 .room-tag {
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
   letter-spacing: 1px;
+  color: #a855f7;
+  text-transform: uppercase;
 }
 
 .device-count {
-  font-size: 0.8rem;
-  margin-left: 8px;
+  font-size: 0.74rem;
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .header-actions {
@@ -134,210 +83,255 @@ body.setup-mode .action-btn {
 }
 
 .stealth-btn {
-  background: transparent;
-  border: 1px solid #222;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
   padding: 6px 12px;
-  color: inherit;
+  color: #cbd5e1;
   font-size: 0.95rem;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-/* Peek Area */
-.peek-area {
+.stealth-btn:active {
+  background: rgba(168, 85, 247, 0.25);
+  border-color: #a855f7;
+  color: #ffffff;
+}
+
+.emergency-btn {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+/* =========================================================
+   UNIFIED HERO PEEK DISPLAY
+   ========================================================= */
+.hero-peek-card {
+  background: rgba(14, 10, 26, 0.9);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 20px;
+  padding: 16px 16px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(168, 85, 247, 0.1);
+}
+
+.hero-peek-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.peek-title {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #a855f7;
+}
+
+.mode-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #c084fc;
+  color: #c084fc;
+  background: rgba(168, 85, 247, 0.12);
+}
+
+.hero-pin-display {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 3.4rem;
+  font-weight: 900;
+  letter-spacing: 6px;
+  text-align: center;
+  color: #ffffff;
+  padding: 14px 6px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 24px rgba(168, 85, 247, 0.25);
+  word-break: break-all;
+  line-height: 1.1;
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+  transition: all 0.15s ease;
+}
+
+.hero-stream-row,
+.hero-outcome-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.stream-prefix {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.stream-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  word-break: break-all;
+}
+
+.outcome-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #c084fc;
+}
+
+.outcome-value.calculated {
+  color: #22c55e;
+  text-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+/* =========================================================
+   5-IN-1 TACTICAL CONTROL DECK
+   ========================================================= */
+.control-deck-card {
+  background: rgba(14, 10, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.peek-label {
-  font-size: 0.75rem;
-  letter-spacing: 1.5px;
+.deck-header {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
   font-weight: 700;
-}
-
-.captured-pin-box,
-.live-expr-box,
-.live-result-box {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.pin-label,
-.expr-label,
-.result-label {
-  font-size: 0.7rem;
   letter-spacing: 1px;
+  color: #94a3b8;
 }
 
-.captured-pin {
-  font-size: 3.2rem;
-  font-weight: 700;
-  font-family: monospace;
-  letter-spacing: 4px;
-  text-align: center;
-  padding: 16px 8px;
-  border: 1px solid #1c1c1e;
-  border-radius: 12px;
-  background-color: #080808;
-  transition: all 0.2s ease;
+.preset-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
-.live-expression,
-.live-result {
-  font-size: 1.3rem;
-  font-family: monospace;
-  padding: 12px;
-  border: 1px solid #1c1c1e;
-  border-radius: 10px;
-  background-color: #080808;
-  word-break: break-all;
-  min-height: 48px;
-}
-
-/* Control Cards */
-.control-card,
-.room-card {
-  border: 1px solid #1c1c1e;
-  border-radius: 12px;
-  padding: 14px;
-  background-color: #080808;
+.preset-tile {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px 6px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
+  justify-content: center;
+  gap: 5px;
+  color: #cbd5e1;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+
+.preset-tile:active {
+  transform: scale(0.94);
+}
+
+.tile-icon {
+  font-size: 1.35rem;
+}
+
+.tile-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.preset-tile.active {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border-color: #c084fc;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.45);
+}
+
+.preset-tile.clean-tile.active {
+  background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+  border-color: #4ade80;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.45);
+}
+
+/* Custom Force Deck */
+.custom-force-deck {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.custom-force-deck input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: 1px;
-}
-
-.mode-badge {
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid currentColor;
-}
-
-.input-row,
-.room-row {
-  display: flex;
-  gap: 8px;
-}
-
-input {
-  flex: 1;
-  background-color: #121214;
-  border: 1px solid #222;
-  color: inherit;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 1rem;
   outline: none;
+  transition: border-color 0.15s ease;
 }
 
-.action-btn {
-  background-color: #1c1c1e;
-  border: 1px solid #333;
-  color: inherit;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.action-btn:active {
-  background-color: #2c2c2e;
-}
-
-/* Preset Buttons */
-.preset-buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.preset-btn {
-  background-color: #121214;
-  border: 1px solid #222;
-  color: inherit;
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.preset-btn:active {
-  background-color: #222;
-}
-
-.preset-btn.active {
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+.custom-force-deck input:focus {
   border-color: #a855f7;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.3);
+}
+
+.deck-save-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
   color: #ffffff;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
-}
-
-/* Mode Switches */
-.mode-switch-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.mode-btn {
-  background-color: #121214;
-  border: 1px solid #222;
-  color: inherit;
-  padding: 12px;
-  border-radius: 8px;
+  border: none;
+  border-radius: 12px;
+  padding: 0 20px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 800;
   font-size: 0.95rem;
-  font-weight: 600;
   cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.08s ease, filter 0.08s ease;
 }
 
-.mode-btn.active {
-  border-color: #444;
-  background-color: #222;
+.deck-save-btn:active {
+  transform: scale(0.93);
+  filter: brightness(1.15);
 }
 
-.calc-links {
-  display: flex;
-  gap: 8px;
-}
-
-.link-btn {
-  flex: 1;
-  text-align: center;
-  background-color: #121214;
-  border: 1px solid #222;
-  color: inherit;
-  padding: 8px 12px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-/* Emergency Fake Notes App Screen */
+/* =========================================================
+   EMERGENCY FAIL-SAFE SCREEN (FAKE NOTES)
+   ========================================================= */
 .emergency-screen {
-  display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: #000000;
-  color: #f2f2f2;
-  z-index: 1000;
+  color: #ffffff;
+  z-index: 999999;
+  display: none;
   flex-direction: column;
-  padding: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(14px + env(safe-area-inset-bottom, 0px)) 16px;
+  user-select: text;
 }
 
 .emergency-screen.active {
@@ -348,13 +342,10 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1.1rem;
-  color: #e5b332;
-  margin-bottom: 24px;
-}
-
-.notes-back {
-  cursor: pointer;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1c1c1e;
+  color: #eab308;
+  font-size: 1.05rem;
 }
 
 .notes-title {
@@ -363,115 +354,30 @@ input {
 }
 
 .notes-done {
-  font-weight: 600;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .notes-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  padding-top: 16px;
 }
 
 .notes-timestamp {
   font-size: 0.8rem;
-  color: #888888;
+  color: #71717a;
   text-align: center;
+  margin-bottom: 16px;
 }
 
 .notes-body {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   line-height: 1.7;
-  color: #e3e3e3;
-  padding: 12px 0;
+  color: #f4f4f5;
+  white-space: pre-line;
 }
 
 /* =========================================================
-   STAGE MODE (DISTRACTION-FREE HUD FOR PERFORMANCE)
-   ========================================================= */
-body.stage-mode .controls-area {
-  display: none !important;
-}
-
-body.stage-mode .console-container {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
-
-body.stage-mode .peek-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 20px;
-}
-
-body.stage-mode .captured-pin-box {
-  align-items: center;
-}
-
-body.stage-mode .pin-label {
-  font-size: 0.8rem;
-  letter-spacing: 2px;
-  color: #666666;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-body.stage-mode .captured-pin {
-  font-size: 4.8rem;
-  font-weight: 800;
-  border: none;
-  background: transparent;
-  color: #ffffff;
-  letter-spacing: 8px;
-  padding: 10px 0;
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.25);
-}
-
-body.stage-mode .live-expr-box,
-body.stage-mode .live-result-box {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid #1a1a1a;
-  border-radius: 14px;
-  padding: 12px 16px;
-}
-
-body.stage-mode .live-expression,
-body.stage-mode .live-result {
-  border: none;
-  background: transparent;
-  padding: 4px 0;
-  font-size: 1.4rem;
-}
-
-/* Calculate Finished Pulse */
-.live-result.calculated {
-  color: #00d26a !important;
-  font-weight: 700;
-  animation: resultGlow 1.5s ease;
-}
-
-@keyframes resultGlow {
-  0% { transform: scale(1.04); text-shadow: 0 0 20px #00d26a; }
-  100% { transform: scale(1); text-shadow: none; }
-}
-
-/* Panic Screen Hint */
-.panic-hint {
-  font-size: 0.65rem;
-  color: #444444;
-  text-align: center;
-  margin-top: auto;
-  padding: 12px 0;
-  letter-spacing: 1px;
-  user-select: none;
-}
-
-/* =========================================================
-   ORIENTATION GUARD (LOCK TO PORTRAIT ON MOBILE)
+   ORIENTATION GUARD
    ========================================================= */
 .orientation-guard {
   display: none;
@@ -483,7 +389,7 @@ body.stage-mode .live-result {
     position: fixed;
     inset: 0;
     background: #000000;
-    z-index: 99999;
+    z-index: 9999999;
     align-items: center;
     justify-content: center;
     text-align: center;

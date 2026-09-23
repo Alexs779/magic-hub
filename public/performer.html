@@ -29,71 +29,79 @@
 
   <!-- Main Performer Stealth Console -->
   <div class="console-container" id="consoleContainer">
-    <!-- Top Bar with Stealth / Brightness Toggle & Fail-Safe -->
+    <!-- Minimalist Stealth Header -->
     <header class="stealth-header">
       <div class="header-left">
+        <span class="status-dot online" id="statusDot"></span>
         <span class="room-tag" id="roomTag">default</span>
         <span class="device-count" id="deviceCount">● 1 подкл.</span>
       </div>
       <div class="header-actions">
-        <button class="stealth-btn" id="stageModeToggleBtn" title="Режим сцены (только перехват)">🎭 СЦЕНА</button>
-        <button class="stealth-btn" id="stealthModeToggle" title="Яркость экрана">🔆</button>
-        <button class="stealth-btn panic-quick-btn" id="emergencyToggleBtn" title="Аварийный экран (или тап 2 пальцами)">📝</button>
+        <button type="button" class="stealth-btn" id="stealthModeToggle" title="Яркость / Контраст">🔆</button>
+        <button type="button" class="stealth-btn emergency-btn" id="emergencyToggleBtn" title="Аварийная маскировка под Заметки (или тап 2 пальцами)">📝</button>
       </div>
     </header>
 
-    <!-- LIVE TELEMETRY PEEK AREA -->
-    <section class="peek-area">
-      <div class="peek-label">ПЕРЕХВАТ ВВОДА (LIVE TELEMETRY)</div>
-      
-      <!-- Big Captured PIN / Secret Number Display -->
-      <div class="captured-pin-box">
-        <span class="pin-label">ПОСЛЕДНИЙ ОПЕРАНД / PIN:</span>
-        <div class="captured-pin" id="capturedPinDisplay">----</div>
+    <!-- UNIFIED HERO PEEK DISPLAY -->
+    <section class="hero-peek-card" id="heroPeekCard">
+      <div class="hero-peek-header">
+        <span class="peek-title">ПЕРЕХВАТ ВВОДА (PIN / ОПЕРАНД)</span>
+        <span class="mode-badge" id="modeBadge">ФОРС АКТИВЕН</span>
       </div>
 
-      <!-- Live Formula Expression -->
-      <div class="live-expr-box">
-        <span class="expr-label">ВЫРАЖЕНИЕ ЗРИТЕЛЯ:</span>
-        <div class="live-expression" id="liveExpressionDisplay">Ожидание зрителя...</div>
+      <!-- Giant Monospace Hero PIN -->
+      <div class="hero-pin-display" id="capturedPinDisplay">----</div>
+
+      <!-- Live Spectator Expression -->
+      <div class="hero-stream-row">
+        <span class="stream-prefix">РАСЧЕТ:</span>
+        <span class="stream-value" id="liveExpressionDisplay">Ожидание зрителя...</span>
       </div>
 
-      <!-- Result / Force Status -->
-      <div class="live-result-box">
-        <span class="result-label">ИТОГОВЫЙ РЕЗУЛЬТАТ (=):</span>
-        <div class="live-result" id="liveResultDisplay">—</div>
+      <!-- Calculated / Force Result Badge -->
+      <div class="hero-outcome-row">
+        <span class="stream-prefix">ФИНАЛ (=):</span>
+        <span class="outcome-value" id="liveResultDisplay">—</span>
       </div>
     </section>
 
-    <!-- CONFIGURATION & CONTROLS -->
-    <section class="controls-area">
-      <!-- 1-Touch Mode Switcher -->
-      <div class="mode-switch-grid" style="grid-template-columns: 1fr 1fr;">
-        <button class="mode-btn active" id="modeToxicBtn">⚡ ФОРС (TOXIC)</button>
-        <button class="mode-btn" id="modePanicBtn">🟢 ЧИСТЫЙ (ОБЫЧНЫЙ)</button>
+    <!-- 5-IN-1 TACTICAL PRESETS DECK -->
+    <section class="control-deck-card">
+      <div class="deck-header">
+        <span>СЦЕНАРИИ 5-В-1 (1 КАСАНИЕ)</span>
       </div>
 
-      <!-- Super 5 Quick Presets Card -->
-      <div class="control-card">
-        <div class="card-header">
-          <span>СЦЕНАРИИ 5-В-1 (БЫСТРАЯ ЦЕЛЬ)</span>
-          <span class="mode-badge" id="modeBadge">ФОРС АКТИВЕН</span>
-        </div>
+      <div class="preset-tiles-grid">
+        <button type="button" class="preset-tile active" id="presetPhoneBtn">
+          <span class="tile-icon">📞</span>
+          <span class="tile-label">Телефон</span>
+        </button>
+        <button type="button" class="preset-tile" id="presetDateBtn">
+          <span class="tile-icon">📅</span>
+          <span class="tile-label">Дата</span>
+        </button>
+        <button type="button" class="preset-tile" id="presetTimeBtn">
+          <span class="tile-icon">⏰</span>
+          <span class="tile-label">Время</span>
+        </button>
+        <button type="button" class="preset-tile" id="presetPinBtn">
+          <span class="tile-icon">🔑</span>
+          <span class="tile-label">PIN 2580</span>
+        </button>
+        <button type="button" class="preset-tile" id="presetBookBtn">
+          <span class="tile-icon">📖</span>
+          <span class="tile-label">Книга 147</span>
+        </button>
+        <button type="button" class="preset-tile clean-tile" id="presetCleanBtn">
+          <span class="tile-icon">🛡️</span>
+          <span class="tile-label">Обычный</span>
+        </button>
+      </div>
 
-        <div class="preset-buttons" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 12px;">
-          <button class="preset-btn" id="presetPhoneBtn">📞 Телефон</button>
-          <button class="preset-btn" id="presetDateBtn">📅 Дата</button>
-          <button class="preset-btn" id="presetTimeBtn">⏰ Время</button>
-          <button class="preset-btn" id="presetPinBtn">🔑 PIN 2580</button>
-          <button class="preset-btn" id="presetBookBtn">📖 Книга 147</button>
-          <button class="preset-btn" id="presetCleanBtn">🛡️ Сброс</button>
-        </div>
-
-        <!-- Custom Target Force Number -->
-        <div class="input-row">
-          <input type="text" id="targetForceInput" placeholder="Свое число форсирования...">
-          <button id="updateForceBtn" class="action-btn">Задать</button>
-        </div>
+      <!-- Custom Force Input Row -->
+      <div class="custom-force-deck">
+        <input type="tel" id="targetForceInput" placeholder="Свое число форса..." autocomplete="off">
+        <button type="button" id="updateForceBtn" class="deck-save-btn">OK</button>
       </div>
     </section>
   </div>
