@@ -157,6 +157,66 @@ app.post('/api/access/buy-request', (req, res) => {
   }
 });
 
+// Lead tracking debounce map
+const leadsRateLimit = new Map();
+function checkLeadRateLimit(key) {
+  const now = Date.now();
+  const windowMs = 5000;
+  const record = leadsRateLimit.get(key);
+  if (!record || now - record > windowMs) {
+    leadsRateLimit.set(key, now);
+    return true;
+  }
+  return false;
+}
+
+// Track Telegram visitor / lead
+app.post('/api/leads/track', (req, res) => {
+  const { userId, username, firstName, lastName, isPremium, languageCode, action } = req.body || {};
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  const debounceKey = `${userId}_${action || 'visited'}`;
+  if (!checkLeadRateLimit(debounceKey)) {
+    return res.json({ success: true, debounced: true });
+  }
+
+  try {
+    const lead = accessManager.recordVisitor({
+      userId,
+      username,
+      firstName,
+      lastName,
+      isPremium,
+      languageCode,
+      action
+    });
+
+    // Optional Telegram notification to superadmin if BOT_TOKEN configured
+    if (process.env.BOT_TOKEN && lead && lead.id !== accessManager.SUPER_ADMIN_ID) {
+      if (lead.visitsCount === 1 || action === 'clicked_buy') {
+        const text = action === 'clicked_buy'
+          ? `🔥 <b>Лид кликнул «КУПИТЬ» (65 USDT)!</b>\n\n👤 <b>Имя:</b> ${lead.firstName} ${lead.lastName || ''}\n🔗 <b>Юзернейм:</b> ${lead.username ? '@' + lead.username : 'отсутствует'}\n🆔 <b>ID:</b> <code>${lead.id}</code>\n⭐️ <b>Premium:</b> ${lead.isPremium ? 'Да' : 'Нет'}\n\n👉 <a href="https://t.me/${lead.username || ''}">Написать в ЛС</a>`
+          : `👀 <b>Новый посетитель открыл Magic Hub!</b>\n\n👤 <b>Имя:</b> ${lead.firstName} ${lead.lastName || ''}\n🔗 <b>Юзернейм:</b> ${lead.username ? '@' + lead.username : 'отсутствует'}\n🆔 <b>ID:</b> <code>${lead.id}</code>\n⭐️ <b>Premium:</b> ${lead.isPremium ? 'Да' : 'Нет'}\n\n👉 <a href="https://t.me/${lead.username || ''}">Написать в ЛС</a>`;
+
+        fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: accessManager.SUPER_ADMIN_ID,
+            text,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+          })
+        }).catch(() => {});
+      }
+    }
+
+    res.json({ success: true, lead });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Helper for hardened admin authentication
 function isAuthorizedAdmin(req) {
   const adminId = req.query.adminId || req.body?.adminId;

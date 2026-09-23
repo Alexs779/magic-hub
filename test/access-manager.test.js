@@ -6,9 +6,9 @@ const { startServer, stopServer } = require('../server.js');
 
 test('AccessManager - Core Access & Admin Logic', (t) => {
   const superAdmin = '7357950968';
-  const testUser = '1122334455';
-  const testUsername = 'test_magician';
-  const validTronTx = 'e1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f80';
+  const testUser = 'test_user_' + crypto.randomBytes(4).toString('hex');
+  const testUsername = 'test_magician_' + crypto.randomBytes(2).toString('hex');
+  const validTronTx = crypto.randomBytes(32).toString('hex');
 
   // 1. SuperAdmin checks
   assert.strictEqual(accessManager.isAdmin(superAdmin), true);
@@ -90,14 +90,54 @@ test('AccessManager - Core Access & Admin Logic', (t) => {
 
   assert.strictEqual(accessManager.verifyTelegramInitData(dataParams.toString(), testBotToken), true);
   assert.strictEqual(accessManager.verifyTelegramInitData(dataParams.toString() + 'tampered', testBotToken), false);
+
+  // 10. Visitor and Lead CRM Tracking
+  const leadUser = 'lead_' + crypto.randomBytes(4).toString('hex');
+  const leadUsername = 'alex_mentalist_' + crypto.randomBytes(2).toString('hex');
+  const leadRecord1 = accessManager.recordVisitor({
+    userId: leadUser,
+    username: leadUsername,
+    firstName: 'Alex',
+    lastName: 'Karpov',
+    isPremium: true,
+    action: 'visited'
+  });
+  assert.strictEqual(leadRecord1.id, leadUser);
+  assert.strictEqual(leadRecord1.username, leadUsername);
+  assert.strictEqual(leadRecord1.visitsCount, 1);
+  assert.strictEqual(leadRecord1.isPremium, true);
+  assert.strictEqual(leadRecord1.status, 'visited');
+
+  // Repeat visit with clicked_buy action
+  const leadRecord2 = accessManager.recordVisitor({
+    userId: leadUser,
+    username: leadUsername,
+    action: 'clicked_buy'
+  });
+  assert.strictEqual(leadRecord2.visitsCount, 2);
+  assert.strictEqual(leadRecord2.status, 'interested');
+  assert.ok(leadRecord2.actions.includes('clicked_buy'));
+
+  // Admin overview includes leads
+  const overview = accessManager.getOverview(superAdmin);
+  assert.ok(Array.isArray(overview.leads));
+  assert.ok(overview.leads.some(l => l.id === leadUser));
+  assert.strictEqual(overview.leadsStats.interested >= 1, true);
+
+  // Granting access updates lead status to licensed
+  accessManager.grantAccess(superAdmin, leadUser);
+  const updatedOverview = accessManager.getOverview(superAdmin);
+  const updatedLead = updatedOverview.leads.find(l => l.id === leadUser);
+  assert.strictEqual(updatedLead.status, 'licensed');
 });
 
 test('Access API & Admin REST Endpoints with Security Headers', async (t) => {
   const { port } = await startServer(0);
   const baseUrl = `http://127.0.0.1:${port}`;
   const superAdmin = '7357950968';
-  const buyerId = '5544332211';
-  const validTx = 'f0e1d2c3b4a5968778695a4b3c2d1e0ff0e1d2c3b4a5968778695a4b3c2d1e0f';
+  const buyerId = 'buyer_' + crypto.randomBytes(4).toString('hex');
+  const buyerUsername = 'buyer_' + crypto.randomBytes(4).toString('hex');
+  const validTx = crypto.randomBytes(32).toString('hex');
 
   // 1. Check Security Headers
   const headRes = await fetch(`${baseUrl}/api/status`);
@@ -106,7 +146,7 @@ test('Access API & Admin REST Endpoints with Security Headers', async (t) => {
   assert.ok(headRes.headers.get('content-security-policy').includes('frame-ancestors'));
 
   // 2. GET /api/access/check for guest
-  const res1 = await fetch(`${baseUrl}/api/access/check?userId=${buyerId}&username=guest_buyer`);
+  const res1 = await fetch(`${baseUrl}/api/access/check?userId=${buyerId}&username=${buyerUsername}`);
   const data1 = await res1.json();
   assert.strictEqual(data1.isAdmin, false);
   assert.strictEqual(data1.hasAccess, false);
@@ -117,7 +157,7 @@ test('Access API & Admin REST Endpoints with Security Headers', async (t) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       userId: buyerId,
-      username: '@guest_buyer',
+      username: `@${buyerUsername}`,
       txHash: validTx,
       network: 'TRC20'
     })
@@ -144,9 +184,25 @@ test('Access API & Admin REST Endpoints with Security Headers', async (t) => {
   assert.strictEqual(data4.success, true);
 
   // 6. Re-check access for buyer
-  const res5 = await fetch(`${baseUrl}/api/access/check?userId=${buyerId}&username=guest_buyer`);
+  const res5 = await fetch(`${baseUrl}/api/access/check?userId=${buyerId}&username=${buyerUsername}`);
   const data5 = await res5.json();
   assert.strictEqual(data5.hasAccess, true);
+
+  // 7. POST /api/leads/track endpoint
+  const res6 = await fetch(`${baseUrl}/api/leads/track`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId: '7788990011',
+      username: 'magic_pro_viewer',
+      firstName: 'Dmitry',
+      isPremium: true,
+      action: 'clicked_buy'
+    })
+  });
+  const data6 = await res6.json();
+  assert.strictEqual(data6.success, true);
+  assert.strictEqual(data6.lead.username, 'magic_pro_viewer');
 
   await stopServer();
 });

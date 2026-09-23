@@ -131,6 +131,28 @@
     refLinkInput.value = `https://t.me/MagicHubBot?start=ref_${userId}`;
   }
 
+  // --- LEAD TELEMETRY TRACKER ---
+  async function trackLeadActivity(action = 'visited') {
+    try {
+      await fetch('/api/leads/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userId,
+          username: tgUser?.username || '',
+          firstName: tgUser?.first_name || '',
+          lastName: tgUser?.last_name || '',
+          isPremium: !!tgUser?.is_premium,
+          languageCode: tgUser?.language_code || 'ru',
+          action: action
+        })
+      });
+    } catch (e) {
+      // Non-blocking telemetry
+    }
+  }
+  trackLeadActivity('visited');
+
   // State
   let forceNumber = localStorage.getItem(`hub_force_${roomId}`) || '79163428812';
   let skin = localStorage.getItem(`hub_skin_${roomId}`) || 'ios';
@@ -471,6 +493,9 @@
   const adminSaveWalletBtn = document.getElementById('adminSaveWalletBtn');
   const adminWhitelistCount = document.getElementById('adminWhitelistCount');
   const adminWhitelistList = document.getElementById('adminWhitelistList');
+  const adminLeadsCount = document.getElementById('adminLeadsCount');
+  const adminLeadsList = document.getElementById('adminLeadsList');
+  const adminRefreshLeadsBtn = document.getElementById('adminRefreshLeadsBtn');
 
   // --- TELEGRAM BACK BUTTON & MODAL CONTROLLER ---
   const pwaModal = document.getElementById('pwaModal');
@@ -504,6 +529,7 @@
     triggerHaptic('medium');
     buyAccessModal?.classList.add('active');
     updateTgBackButton();
+    trackLeadActivity('clicked_buy');
   }
 
   function closeBuyModal() {
@@ -780,6 +806,77 @@
       }
     }
 
+    // 2. Leads CRM List
+    const leads = data.leads || [];
+    if (adminLeadsCount) adminLeadsCount.textContent = leads.length;
+    if (adminLeadsList) {
+      if (leads.length === 0) {
+        adminLeadsList.innerHTML = '<div class="admin-empty-state">Нет посетителей</div>';
+      } else {
+        const whitelistArr = data.whitelist || [];
+        adminLeadsList.innerHTML = leads.map(lead => {
+          const isInterested = lead.status === 'interested' || (Array.isArray(lead.actions) && lead.actions.includes('clicked_buy'));
+          const isLicensed = lead.status === 'licensed' || whitelistArr.includes(lead.id) || (lead.username && whitelistArr.includes(lead.username));
+
+          let statusBadge = '<span class="admin-lead-status-badge status-visited">👀 Просмотр</span>';
+          if (lead.id === '7357950968') {
+            statusBadge = '<span class="admin-lead-status-badge" style="background: rgba(168,85,247,0.2); color: #c084fc;">👑 ВЫ (АДМИН)</span>';
+          } else if (isLicensed) {
+            statusBadge = '<span class="admin-lead-status-badge status-licensed">✅ Куплено</span>';
+          } else if (isInterested) {
+            statusBadge = '<span class="admin-lead-status-badge status-interested">🔥 Кликнул «Купить»</span>';
+          }
+
+          const pmLink = lead.username
+            ? `https://t.me/${encodeURIComponent(lead.username)}`
+            : `tg://user?id=${encodeURIComponent(lead.id)}`;
+
+          const timeFormatted = lead.lastSeen ? formatLeadTime(lead.lastSeen) : 'Недавно';
+
+          return `
+            <div class="admin-lead-item ${isInterested ? 'interested' : ''} ${isLicensed ? 'licensed' : ''}">
+              <div class="admin-lead-header">
+                <div class="admin-lead-user">
+                  <div class="admin-lead-name-row">
+                    <span>${escapeHtml(lead.firstName || '')} ${escapeHtml(lead.lastName || '')}</span>
+                    ${lead.isPremium ? '<span class="admin-lead-premium-badge">⭐️ PREMIUM</span>' : ''}
+                  </div>
+                  <span class="admin-lead-handle">${lead.username ? '@' + escapeHtml(lead.username) : 'нет юзернейма'}</span>
+                  <span class="admin-lead-id">ID: ${escapeHtml(lead.id)}</span>
+                </div>
+                ${statusBadge}
+              </div>
+
+              <div class="admin-lead-stats">
+                <span><i class="fa-solid fa-arrow-pointer"></i> Визитов: ${lead.visitsCount || 1}</span>
+                <span><i class="fa-solid fa-clock"></i> ${timeFormatted}</span>
+              </div>
+
+              ${lead.id === '7357950968' ? '' : `
+                <div class="admin-lead-actions">
+                  <a href="${pmLink}" target="_blank" class="admin-lead-pm-btn">
+                    <i class="fa-brands fa-telegram"></i> Написать в ЛС
+                  </a>
+                  ${!isLicensed ? `
+                    <button class="admin-lead-grant-btn" data-user="${escapeHtml(lead.username || lead.id)}">
+                      <i class="fa-solid fa-bolt"></i> Выдать доступ
+                    </button>
+                  ` : ''}
+                </div>
+              `}
+            </div>
+          `;
+        }).join('');
+
+        adminLeadsList.querySelectorAll('.admin-lead-grant-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-user');
+            if (target) grantAccessToUser(target);
+          });
+        });
+      }
+    }
+
     // 2. Wallets
     if (data.wallet) {
       if (adminWalletTrc20 && !adminWalletTrc20.value) adminWalletTrc20.value = data.wallet.trc20 || '';
@@ -877,25 +974,19 @@
     showToast('Данные обновлены');
   });
 
-  // Admin manual grant button
-  adminGrantBtn?.addEventListener('click', async () => {
-    const val = adminGrantInput?.value.trim();
-    if (!val) {
-      showToast('Введите @username или ID', 'error');
-      return;
-    }
+  async function grantAccessToUser(identifier) {
+    if (!identifier) return;
     triggerHaptic('rigid');
     try {
       const res = await fetch('/api/admin/grant', {
         method: 'POST',
         headers: getAdminHeaders(),
-        body: JSON.stringify({ adminId: userId, identifier: val })
+        body: JSON.stringify({ adminId: userId, identifier })
       });
       const d = await res.json();
       if (d.success) {
         triggerHaptic('success');
-        showToast(`Доступ выдан: ${val}`);
-        if (adminGrantInput) adminGrantInput.value = '';
+        showToast(`Доступ выдан: ${identifier}`);
         loadAdminOverview();
       } else {
         throw new Error(d.error || 'Ошибка');
@@ -903,6 +994,42 @@
     } catch (e) {
       showToast(e.message, 'error');
     }
+  }
+
+  function formatLeadTime(isoStr) {
+    try {
+      const d = new Date(isoStr);
+      const diffMin = Math.round((Date.now() - d.getTime()) / 60000);
+      if (diffMin < 1) return 'Только что';
+      if (diffMin < 60) return `${diffMin} мин назад`;
+      const diffHours = Math.round(diffMin / 60);
+      if (diffHours < 24) return `${diffHours} ч назад`;
+      return `${d.toLocaleDateString('ru-RU')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    } catch (e) {
+      return 'Недавно';
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Admin refresh leads button
+  adminRefreshLeadsBtn?.addEventListener('click', () => {
+    triggerHaptic('light');
+    loadAdminOverview();
+    showToast('Список лидов обновлен');
+  });
+
+  // Admin manual grant button
+  adminGrantBtn?.addEventListener('click', async () => {
+    const val = adminGrantInput?.value.trim();
+    if (!val) {
+      showToast('Введите @username или ID', 'error');
+      return;
+    }
+    await grantAccessToUser(val);
+    if (adminGrantInput) adminGrantInput.value = '';
   });
 
   // Admin save wallet button
