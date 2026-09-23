@@ -564,6 +564,19 @@
     updateTgBackButton();
   });
 
+  // --- GO TO ACADEMY FROM MODAL ---
+  document.getElementById('hubGoToAcademyBtn')?.addEventListener('click', () => {
+    triggerHaptic('light');
+    closeCalcSettings();
+    navItems.forEach(n => {
+      if (n.getAttribute('data-tab') === 'academy') n.classList.add('active');
+      else n.classList.remove('active');
+    });
+    tabViews.forEach(v => v.classList.remove('active'));
+    document.getElementById('view-academy')?.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
   document.getElementById('closePwaModalBtn')?.addEventListener('click', () => {
     pwaModal?.classList.remove('active');
     updateTgBackButton();
@@ -626,9 +639,9 @@
     } else {
       if (calcStatusBadge) {
         calcStatusBadge.className = 'badge-locked';
-        calcStatusBadge.innerHTML = '<i class="fa-solid fa-lock"></i> ДОСТУП ЗАКРЫТ • 45 USDT';
+        calcStatusBadge.innerHTML = '<i class="fa-solid fa-lock"></i> ДОСТУП ЗАКРЫТ • 65 USDT';
       }
-      if (openCalcBtnText) openCalcBtnText.textContent = 'Купить доступ (45 USDT)';
+      if (openCalcBtnText) openCalcBtnText.textContent = 'Купить доступ (65 USDT)';
       if (openCalcBtnIcon) openCalcBtnIcon.className = 'fa-solid fa-lock';
       if (buyStatusInfo) {
         buyStatusInfo.style.display = 'none';
@@ -741,7 +754,7 @@
                 <span class="admin-pending-name">${item.username ? '@' + item.username : 'User ' + item.userId}</span>
                 <span class="admin-pending-id">ID: ${item.userId}</span>
               </div>
-              <span class="admin-pending-badge">${item.network || 'USDT'} • 45 USDT</span>
+              <span class="admin-pending-badge">${item.network || 'USDT'} • 65 USDT</span>
             </div>
             <div class="admin-pending-txid-box">
               <span class="admin-pending-txid-label">TXID:</span>
