@@ -942,7 +942,17 @@
       calculate();
     } else if (action === 'percent') {
       inputOperator('%');
+    } else if (action === 'parens') {
+      // Secret Trigger: Tapping ( ) toggles the In-Calculator Stealth HUD!
+      toggleInCalcHud();
     }
+  });
+
+  // Direct Parens Button click listener for instant response
+  const parensBtn = document.getElementById('parensBtn');
+  parensBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleInCalcHud();
   });
 
   // Scientific drawer toggle
