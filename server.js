@@ -327,6 +327,39 @@ async function setupTelegramBot(botToken, appUrl = APP_BASE_URL) {
     results.menuButtonError = err.message;
   }
 
+  // Set bot description (displayed before pressing Start)
+  try {
+    const desc = "🔮 MAGIC HUB — Секретная экосистема сценического ментализма и цифровой магии.\n\n" +
+      "📱 Chameleon Calculator 5-в-1:\n" +
+      "• Невидимый перехват мыслей и PIN-кодов зрителя в реальном времени\n" +
+      "• Незаметный форс любых чисел (телефон, PIN, дата, время, книга)\n" +
+      "• Stealth Peek: работа с 1 или 2 устройств (iOS / Android / Samsung)\n" +
+      "• Тактическая консоль с маскировкой под «Заметки» при подозрении\n\n" +
+      "🚀 Нажмите «Запустить» ниже, чтобы открыть Magic Hub!";
+
+    const descRes = await fetch(`https://api.telegram.org/bot${botToken}/setMyDescription`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: desc })
+    });
+    results.description = await descRes.json();
+  } catch (err) {
+    results.descriptionError = err.message;
+  }
+
+  // Set bot short description (profile bio, max 120 chars)
+  try {
+    const shortDesc = "Секретная экосистема сценического ментализма и цифровой магии. Chameleon Calculator 5-в-1.";
+    const sDescRes = await fetch(`https://api.telegram.org/bot${botToken}/setMyShortDescription`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ short_description: shortDesc })
+    });
+    results.shortDescription = await sDescRes.json();
+  } catch (err) {
+    results.shortDescriptionError = err.message;
+  }
+
   return results;
 }
 
