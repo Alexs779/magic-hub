@@ -9,6 +9,8 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 const PORT = process.env.PORT || 3030;
+const DEFAULT_BOT_USERNAME = process.env.BOT_USERNAME || 'magichub_tetris_bot';
+const APP_BASE_URL = process.env.RENDER_EXTERNAL_URL || process.env.APP_URL || 'https://magic-hub.onrender.com';
 
 // Security & Anti-Cloning HTTP Headers
 app.use((req, res, next) => {
@@ -135,7 +137,9 @@ app.get('/api/access/check', (req, res) => {
     hasAccess,
     pending: !!pending,
     pendingDetails: pending,
-    wallet: data.wallet
+    wallet: data.wallet,
+    botUsername: DEFAULT_BOT_USERNAME,
+    appUrl: APP_BASE_URL
   });
 });
 
@@ -214,6 +218,129 @@ app.post('/api/leads/track', (req, res) => {
     res.json({ success: true, lead });
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+});
+
+// --- TELEGRAM BOT WEBHOOK & INTERACTIVE MESSAGING ---
+app.post('/api/telegram/webhook', async (req, res) => {
+  // Acknowledge receipt to Telegram immediately
+  res.status(200).send('OK');
+
+  const update = req.body;
+  if (!update || !update.message) return;
+
+  const msg = update.message;
+  const text = (msg.text || '').trim();
+  const token = process.env.BOT_TOKEN;
+  if (!token) return;
+
+  if (text.startsWith('/start')) {
+    const parts = text.split(/\s+/);
+    const startParam = parts[1] || '';
+    let referrerId = '';
+    if (startParam.startsWith('ref_')) {
+      referrerId = startParam.replace('ref_', '');
+    }
+
+    const from = msg.from || {};
+    try {
+      accessManager.recordVisitor({
+        userId: from.id,
+        username: from.username,
+        firstName: from.first_name,
+        lastName: from.last_name,
+        isPremium: from.is_premium,
+        languageCode: from.language_code,
+        action: referrerId ? `ref_by_${referrerId}` : 'bot_start'
+      });
+    } catch (e) {}
+
+    const appUrl = `${APP_BASE_URL}/hub/`;
+    const welcomeText = `🔮 <b>MAGIC HUB</b>\n\n` +
+      `Добро пожаловать в секретную платформу сценического ментализма и цифровой магии!\n\n` +
+      `✨ <b>Chameleon Calculator 5-в-1:</b>\n` +
+      `• Невидимый перехват мыслей зрителя\n` +
+      `• Незаметный форс любых чисел (телефон, PIN, дата, время)\n` +
+      `• Ультра-скрытая консоль менталиста\n` +
+      `• Работа с 1 или 2 устройств\n\n` +
+      `Нажмите кнопку ниже, чтобы запустить приложение:`;
+
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: msg.chat.id,
+          text: welcomeText,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: '🚀 Запустить Magic Hub',
+                  web_app: { url: appUrl }
+                }
+              ]
+            ]
+          }
+        })
+      });
+    } catch (e) {
+      console.warn('[Telegram Webhook] sendMessage failed:', e.message);
+    }
+  }
+});
+
+// Setup bot webhook & chat menu button
+async function setupTelegramBot(botToken, appUrl = APP_BASE_URL) {
+  const results = {};
+  try {
+    const whRes = await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${appUrl}/api/telegram/webhook`,
+        allowed_updates: ['message', 'callback_query']
+      })
+    });
+    results.webhook = await whRes.json();
+  } catch (err) {
+    results.webhookError = err.message;
+  }
+
+  try {
+    const mbRes = await fetch(`https://api.telegram.org/bot${botToken}/setChatMenuButton`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        menu_button: {
+          type: 'web_app',
+          text: 'Magic Hub',
+          web_app: {
+            url: `${appUrl}/hub/`
+          }
+        }
+      })
+    });
+    results.menuButton = await mbRes.json();
+  } catch (err) {
+    results.menuButtonError = err.message;
+  }
+
+  return results;
+}
+
+app.get('/api/telegram/setup-bot', async (req, res) => {
+  const token = req.query.token || process.env.BOT_TOKEN;
+  if (!token) {
+    return res.status(400).json({ error: 'Missing BOT_TOKEN (provide ?token=... or set BOT_TOKEN env var)' });
+  }
+  const appUrl = req.query.appUrl || APP_BASE_URL;
+  try {
+    const results = await setupTelegramBot(token, appUrl);
+    res.json({ success: true, appUrl, ...results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -515,6 +642,13 @@ function startServer(port = PORT, host = '0.0.0.0') {
       }
       console.log(`🕶️ Performer Stealth Peek (Local):  http://localhost:${actualPort}/performer.html`);
       console.log('='.repeat(65));
+
+      if (process.env.BOT_TOKEN) {
+        setupTelegramBot(process.env.BOT_TOKEN, APP_BASE_URL)
+          .then(r => console.log('🔮 Telegram Bot auto-setup completed:', r))
+          .catch(err => console.warn('🔮 Telegram Bot setup notice:', err.message));
+      }
+
       resolve({ server, port: actualPort });
     });
   });

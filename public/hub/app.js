@@ -125,11 +125,21 @@
   const userHandleTag = document.getElementById('userHandleTag');
   if (userHandleTag) userHandleTag.textContent = userTagStr;
 
-  // Affiliate ref link
+  // Affiliate ref link & Bot links
   const refLinkInput = document.getElementById('refLinkInput');
-  if (refLinkInput) {
-    refLinkInput.value = `https://t.me/MagicHubBot?start=ref_${userId}`;
+  let currentBotUsername = 'magichub_tetris_bot';
+
+  function updateBotLinks(username = currentBotUsername) {
+    currentBotUsername = username || 'magichub_tetris_bot';
+    if (refLinkInput) {
+      refLinkInput.value = `https://t.me/${currentBotUsername}?start=ref_${userId}`;
+    }
+    const supportLinkBtn = document.getElementById('supportLinkBtn');
+    if (supportLinkBtn) {
+      supportLinkBtn.href = `https://t.me/${currentBotUsername}`;
+    }
   }
+  updateBotLinks();
 
   // --- LEAD TELEMETRY TRACKER ---
   async function trackLeadActivity(action = 'visited') {
@@ -780,6 +790,7 @@
         isPending = !!data.pending;
         pendingDetails = data.pendingDetails || null;
         if (data.wallet) walletConfig = data.wallet;
+        if (data.botUsername) updateBotLinks(data.botUsername);
 
         updateAccessUI();
 
