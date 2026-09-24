@@ -144,6 +144,9 @@
               <div style="padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border-left: 3px solid #eab308;">
                 <strong style="color: #fff;">Тап 2 пальцами в Stealth Console:</strong> Аварийная маскировка под «Заметки со списком покупок».
               </div>
+              <div style="padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border-left: 3px solid #8b5cf6;">
+                <strong style="color: #fff;">Свайп 2 пальцами вниз (или дабл-тап в правый угол):</strong> Вызов скрытой шторки менталиста (Stealth HUD) прямо в калькуляторе — живой PIN, формула и смена пресетов без переключения и закрытия окон!
+              </div>
               <div style="padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border-left: 3px solid #ec4899;">
                 <strong style="color: #fff;">Соло-подсмотр на 1 телефоне (Удержание экрана 500 мс):</strong> Если у вас нет второго телефона — зажмите табло на 0.5с: калькулятор на 1.2 сек покажет перехваченный PIN. Также в углу табло виден микро-индикатор.
               </div>
@@ -471,24 +474,28 @@
 
           <!-- Primary Action Buttons -->
           <div class="action-buttons-stack">
-            <button class="primary-action-btn" id="hubCopySpectatorBtn">
-              <i class="fa-solid fa-copy"></i>
-              <span>Скопировать ссылку на Калькулятор</span>
+            <!-- Mode 1: Single Phone 2-in-1 Simulator (Screen is split, zero tab switching, impossible to close) -->
+            <button class="primary-action-btn test-drive-btn" id="hubOpenSimulatorBtn" style="background: linear-gradient(135deg, #7c3aed, #2563eb); border: 1px solid rgba(168,85,247,0.5); box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);">
+              <i class="fa-solid fa-gamepad"></i>
+              <span>📱 2-в-1: Калькулятор + Консоль (Тренажер)</span>
             </button>
+            <div style="font-size: 0.72rem; color: #94a3b8; text-align: center; margin-top: -4px;">
+              ⚡ Для 1 телефона: экран разделен, ничего не закрывается!
+            </div>
             
-            <div class="split-buttons-row">
-              <button class="secondary-action-btn" id="hubOpenCalcBtn">
-                <i class="fa-regular fa-clone"></i> Запустить
+            <div class="split-buttons-row" style="margin-top: 8px;">
+              <button class="secondary-action-btn" id="hubOpenCalcBtn" title="Открыть полноэкранный калькулятор (свайп 2 пальцами вниз открывает шторку менталиста)">
+                <i class="fa-solid fa-calculator"></i> Открыть калькулятор
               </button>
               <button class="secondary-action-btn" id="hubOpenPeekBtn">
                 <i class="fa-solid fa-eye-slash"></i> Stealth Console
               </button>
             </div>
 
-            <!-- Single-Screen Simulator (Test-Drive) -->
-            <button class="primary-action-btn test-drive-btn" id="hubOpenSimulatorBtn" style="background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(59,130,246,0.25)); border: 1px solid rgba(168,85,247,0.4); margin-top: 8px;">
-              <i class="fa-solid fa-gamepad" style="color: #c084fc;"></i>
-              <span>🎮 ТЕСТ-ДРАЙВ (Симулятор с одного экрана)</span>
+            <!-- Mode 2: Real Stage Performance (2 Phones or PWA) -->
+            <button class="secondary-action-btn" id="hubCopySpectatorBtn" style="margin-top: 6px;">
+              <i class="fa-solid fa-copy"></i>
+              <span>Скопировать ссылку для зрителя</span>
             </button>
           </div>
 

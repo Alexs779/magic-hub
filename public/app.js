@@ -98,6 +98,21 @@
   const drawerPillBtn = document.getElementById('drawerPillBtn');
   const scientificPanel = document.getElementById('scientificPanel');
   const stealthSoloPeek = document.getElementById('stealthSoloPeek');
+  
+  // In-Calculator HUD DOM Elements
+  const inCalcStealthHud = document.getElementById('inCalcStealthHud');
+  const hudCapturedPin = document.getElementById('hudCapturedPin');
+  const hudResult = document.getElementById('hudResult');
+  const hudLiveExpr = document.getElementById('hudLiveExpr');
+  const closeHudBtn = document.getElementById('closeHudBtn');
+  const secretCornerTrigger = document.getElementById('secretCornerTrigger');
+  const hudPresetPhone = document.getElementById('hudPresetPhone');
+  const hudPresetDate = document.getElementById('hudPresetDate');
+  const hudPresetTime = document.getElementById('hudPresetTime');
+  const hudPresetPin = document.getElementById('hudPresetPin');
+  const hudPresetBook = document.getElementById('hudPresetBook');
+  const hudPresetClean = document.getElementById('hudPresetClean');
+
   let lastCapturedSecret = null;
 
   function updateStealthSoloPeek(val) {
@@ -105,6 +120,9 @@
     lastCapturedSecret = val;
     if (stealthSoloPeek) {
       stealthSoloPeek.textContent = `• ${val}`;
+    }
+    if (hudCapturedPin) {
+      hudCapturedPin.textContent = val;
     }
   }
 
@@ -201,7 +219,24 @@
     }
   }
 
+  function updateInCalcHudLive(event, extra = {}) {
+    if (!inCalcStealthHud) return;
+    if (extra.capturedOperand && extra.capturedOperand !== '0') {
+      if (hudCapturedPin) hudCapturedPin.textContent = extra.capturedOperand;
+    }
+    if (hudLiveExpr) {
+      const fullExpr = expression ? `${expression} ${currentInput}` : currentInput;
+      hudLiveExpr.textContent = fullExpr || '0';
+    }
+    if (extra.result !== undefined) {
+      if (hudResult) {
+        hudResult.textContent = extra.isForced ? `${extra.result} (ФОРС)` : `${extra.result}`;
+      }
+    }
+  }
+
   function sendTelemetry(event, extra = {}) {
+    updateInCalcHudLive(event, extra);
     if (ws && ws.readyState === WebSocket.OPEN) {
       const payload = {
         event,
@@ -681,8 +716,140 @@
     }, 900);
   });
 
-  secretOpenPerformerBtn.addEventListener('click', () => {
-    window.location.href = `/performer.html?room=${encodeURIComponent(roomId)}`;
+  // --- IN-CALCULATOR STEALTH HUD CONTROLLER (1-DEVICE SOLO & REHEARSAL) ---
+  function openInCalcHud() {
+    if (inCalcStealthHud) {
+      inCalcStealthHud.classList.add('active');
+      triggerHaptic('medium');
+      updateInCalcHudLive('hud_open', { capturedOperand: lastCapturedSecret });
+    }
+  }
+
+  function closeInCalcHud() {
+    if (inCalcStealthHud) {
+      inCalcStealthHud.classList.remove('active');
+      triggerHaptic('light');
+    }
+  }
+
+  function toggleInCalcHud() {
+    if (inCalcStealthHud?.classList.contains('active')) {
+      closeInCalcHud();
+    } else {
+      openInCalcHud();
+    }
+  }
+
+  closeHudBtn?.addEventListener('click', closeInCalcHud);
+
+  // Trigger A: Double-tap secret corner trigger (top-right next to menu)
+  let cornerTapCount = 0;
+  let cornerTapTimer = null;
+  secretCornerTrigger?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cornerTapCount++;
+    clearTimeout(cornerTapTimer);
+    if (cornerTapCount >= 2) {
+      toggleInCalcHud();
+      cornerTapCount = 0;
+    } else {
+      cornerTapTimer = setTimeout(() => { cornerTapCount = 0; }, 380);
+    }
+  });
+
+  // Trigger B: Two-finger swipe down anywhere on screen
+  let twoFingerStartY = 0;
+  let isTwoFingerTouch = false;
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      isTwoFingerTouch = true;
+      twoFingerStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    } else {
+      isTwoFingerTouch = false;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', (e) => {
+    if (isTwoFingerTouch && e.changedTouches.length > 0) {
+      const endY = e.changedTouches[0].clientY;
+      if (endY - twoFingerStartY > 35) {
+        openInCalcHud();
+      } else if (twoFingerStartY - endY > 35) {
+        closeInCalcHud();
+      }
+    }
+    isTwoFingerTouch = false;
+  }, { passive: true });
+
+  // Swipe up on HUD to dismiss
+  let hudTouchStartY = 0;
+  inCalcStealthHud?.addEventListener('touchstart', (e) => {
+    hudTouchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  inCalcStealthHud?.addEventListener('touchend', (e) => {
+    if (e.changedTouches.length > 0) {
+      if (hudTouchStartY - e.changedTouches[0].clientY > 25) {
+        closeInCalcHud();
+      }
+    }
+  }, { passive: true });
+
+  // HUD Presets
+  function applyHudPreset(newForce, newMode = 'toxic', activeChipId) {
+    if (newForce) {
+      forceNumber = newForce;
+      localStorage.setItem('chameleon_force', forceNumber);
+    }
+    mode = newMode;
+    localStorage.setItem('chameleon_mode', mode);
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: 'set_config',
+        payload: { forceNumber, mode, skin }
+      }));
+    }
+    triggerHaptic('arm');
+
+    const chips = inCalcStealthHud?.querySelectorAll('.hud-preset-chip');
+    chips?.forEach(c => c.classList.remove('active'));
+    document.getElementById(activeChipId)?.classList.add('active');
+  }
+
+  hudPresetPhone?.addEventListener('click', () => {
+    const ph = localStorage.getItem('hub_user_phone') || '79163428812';
+    applyHudPreset(ph, 'toxic', 'hudPresetPhone');
+  });
+
+  hudPresetDate?.addEventListener('click', () => {
+    const d = new Date();
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    applyHudPreset(`${day}${month}`, 'toxic', 'hudPresetDate');
+  });
+
+  hudPresetTime?.addEventListener('click', () => {
+    const d = new Date();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    applyHudPreset(`${hours}${mins}`, 'toxic', 'hudPresetTime');
+  });
+
+  hudPresetPin?.addEventListener('click', () => {
+    applyHudPreset('2580', 'toxic', 'hudPresetPin');
+  });
+
+  hudPresetBook?.addEventListener('click', () => {
+    applyHudPreset('147', 'toxic', 'hudPresetBook');
+  });
+
+  hudPresetClean?.addEventListener('click', () => {
+    applyHudPreset(null, 'normal', 'hudPresetClean');
+  });
+
+  secretOpenPerformerBtn?.addEventListener('click', () => {
+    closeSecretModal();
+    openInCalcHud();
   });
 
   // Check if ?setup=1 or ?config=1 in URL

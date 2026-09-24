@@ -13,6 +13,44 @@
 </head>
 <body>
   <div class="calculator-container" id="calculatorApp">
+    <!-- In-Calculator Slide-Out Stealth HUD (for 1-Device Rehearsal & Solo Performance) -->
+    <div class="incalc-stealth-hud" id="inCalcStealthHud">
+      <div class="hud-top-bar">
+        <div class="hud-brand">
+          <span class="hud-dot online"></span>
+          <span class="hud-title">STEALTH PEEK HUD</span>
+        </div>
+        <div class="hud-actions">
+          <button type="button" class="hud-btn-close" id="closeHudBtn" title="Скрыть шторку">✕</button>
+        </div>
+      </div>
+
+      <div class="hud-body">
+        <div class="hud-stat-box">
+          <span class="hud-label">ПЕРЕХВАТ PIN:</span>
+          <span class="hud-pin-val" id="hudCapturedPin">----</span>
+        </div>
+        <div class="hud-stat-box">
+          <span class="hud-label">ФИНАЛ (=):</span>
+          <span class="hud-result-val" id="hudResult">—</span>
+        </div>
+      </div>
+
+      <div class="hud-stream-row">
+        <span class="hud-label">РАСЧЕТ:</span>
+        <span class="hud-stream-val" id="hudLiveExpr">Ожидание ввода...</span>
+      </div>
+
+      <div class="hud-presets-grid">
+        <button type="button" class="hud-preset-chip active" id="hudPresetPhone">📞 Тел</button>
+        <button type="button" class="hud-preset-chip" id="hudPresetDate">📅 Дата</button>
+        <button type="button" class="hud-preset-chip" id="hudPresetTime">⏰ Время</button>
+        <button type="button" class="hud-preset-chip" id="hudPresetPin">🔑 PIN</button>
+        <button type="button" class="hud-preset-chip" id="hudPresetBook">📖 Книга</button>
+        <button type="button" class="hud-preset-chip hud-clean" id="hudPresetClean">🛡️ 2+2=4</button>
+      </div>
+    </div>
+
     <!-- Top Action Bar -->
     <header class="calc-header">
       <div class="header-left">
@@ -20,6 +58,8 @@
         <span class="status-indicator" id="secretStatusSpot" title=""></span>
       </div>
       <div class="header-right">
+        <!-- Secret Corner Trigger for Slide HUD: double tap right edge -->
+        <span class="secret-corner-trigger" id="secretCornerTrigger" title=""></span>
         <!-- 3-Dots Menu -->
         <button class="icon-btn" id="menuBtn" aria-label="Меню">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
