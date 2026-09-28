@@ -1001,6 +1001,8 @@
   const pwaAndroidView = document.getElementById('pwaAndroidView');
   const pwaIosView = document.getElementById('pwaIosView');
   const menuInstallPwa = document.getElementById('menuInstallPwa');
+  const pwaToastBanner = document.getElementById('pwaToastBanner');
+  const pwaToastCloseBtn = document.getElementById('pwaToastCloseBtn');
 
   let deferredInstallPrompt = null;
 
@@ -1010,10 +1012,28 @@
            (document.referrer && document.referrer.includes('android-app://'));
   }
 
+  function showInstalledReminderToast() {
+    if (isStandaloneApp()) return; // Pure fullscreen standalone mode needs no reminder!
+    if (pwaToastBanner) {
+      pwaToastBanner.style.display = 'flex';
+      setTimeout(() => {
+        if (pwaToastBanner) pwaToastBanner.style.display = 'none';
+      }, 5500);
+    }
+  }
+
   function showPwaPrompt(force = false) {
     if (isStandaloneApp()) return; // Already running in standalone PWA mode!
-    if (!force && sessionStorage.getItem('pwa_prompt_dismissed') === '1') {
-      return;
+    if (!force) {
+      // If already installed to phone desktop, don't ask again! Show friendly reminder toast
+      if (localStorage.getItem('pwa_installed') === 'true') {
+        showInstalledReminderToast();
+        return;
+      }
+      // If user previously dismissed the prompt, do not bother them again
+      if (localStorage.getItem('pwa_prompt_dismissed') === 'true') {
+        return;
+      }
     }
 
     const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) && !window.MSStream;
@@ -1034,25 +1054,36 @@
     if (pwaInstallModal) {
       pwaInstallModal.style.display = 'none';
     }
-    sessionStorage.setItem('pwa_prompt_dismissed', '1');
+    localStorage.setItem('pwa_prompt_dismissed', 'true');
   }
+
+  // Native W3C event: fired when user successfully installs PWA
+  window.addEventListener('appinstalled', () => {
+    console.log('[PWA] Application successfully installed to home screen');
+    localStorage.setItem('pwa_installed', 'true');
+    localStorage.setItem('pwa_installed_time', String(Date.now()));
+    hidePwaPrompt();
+    showInstalledReminderToast();
+  });
 
   // Intercept Chrome/Android beforeinstallprompt
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    // Show prompt automatically on launch if not standalone
+    // Show prompt automatically on launch only if not already installed or dismissed
     showPwaPrompt(false);
   });
 
   // Handle native install click
   pwaPromptInstallBtn?.addEventListener('click', async () => {
+    localStorage.setItem('pwa_installed', 'true');
     if (deferredInstallPrompt) {
       deferredInstallPrompt.prompt();
       try {
         const choiceResult = await deferredInstallPrompt.userChoice;
         if (choiceResult && choiceResult.outcome === 'accepted') {
           console.log('[PWA] User accepted installation');
+          localStorage.setItem('pwa_installed', 'true');
         }
       } catch (err) {
         console.warn('[PWA] prompt error:', err);
@@ -1066,7 +1097,10 @@
   });
 
   pwaPromptDismissBtn?.addEventListener('click', hidePwaPrompt);
-  pwaPromptIosOkBtn?.addEventListener('click', hidePwaPrompt);
+  pwaPromptIosOkBtn?.addEventListener('click', () => {
+    localStorage.setItem('pwa_installed', 'true');
+    hidePwaPrompt();
+  });
   pwaPromptCloseBtn?.addEventListener('click', hidePwaPrompt);
   pwaInstallModal?.addEventListener('click', (e) => {
     if (e.target === pwaInstallModal) {
@@ -1074,7 +1108,11 @@
     }
   });
 
-  // From 3-dots menu
+  pwaToastCloseBtn?.addEventListener('click', () => {
+    if (pwaToastBanner) pwaToastBanner.style.display = 'none';
+  });
+
+  // From 3-dots menu: allow manual re-opening anytime
   menuInstallPwa?.addEventListener('click', (e) => {
     e.stopPropagation();
     closeMenuModal();
@@ -1086,9 +1124,10 @@
     const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) && !window.MSStream;
     if (isIos) {
       showPwaPrompt(false);
-    } else if (!isStandaloneApp() && !sessionStorage.getItem('pwa_prompt_dismissed')) {
-      // In case beforeinstallprompt already fired or wasn't supported
+    } else if (!isStandaloneApp() && !localStorage.getItem('pwa_prompt_dismissed') && !localStorage.getItem('pwa_installed')) {
       showPwaPrompt(false);
+    } else if (localStorage.getItem('pwa_installed') === 'true') {
+      showInstalledReminderToast();
     }
   }, 1000);
 
