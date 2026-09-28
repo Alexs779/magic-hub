@@ -383,8 +383,15 @@ body.setup-mode {
   display: none;
 }
 
-@media screen and (orientation: landscape) and (max-height: 520px) {
-  .orientation-guard {
+/* Suppress orientation guard whenever any input/textarea is focused */
+body:has(input:focus) .orientation-guard,
+body:has(textarea:focus) .orientation-guard,
+body:has(select:focus) .orientation-guard {
+  display: none !important;
+}
+
+@media screen and (orientation: landscape) and (min-width: 650px) and (max-height: 520px) {
+  body:not(:has(input:focus)):not(:has(textarea:focus)) .orientation-guard {
     display: flex !important;
     position: fixed;
     inset: 0;
@@ -418,3 +425,4 @@ body.setup-mode {
     color: #888888;
   }
 }
+

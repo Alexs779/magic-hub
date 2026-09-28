@@ -114,7 +114,7 @@
               </div>
               <div style="display: flex; gap: 10px; align-items: flex-start;">
                 <span style="background: rgba(255,255,255,0.1); border-radius: 6px; padding: 2px 8px; font-weight: 700; font-family: var(--font-mono); font-size: 0.8rem;">2</span>
-                <div><strong>Запуск:</strong> Нажмите «Скопировать ссылку» и откройте калькулятор на телефоне (для идеального эффекта добавьте иконку на экран «Домой» через PWA-инструкцию).</div>
+                <div><strong>Запуск:</strong> Нажмите кнопку «Запустить калькулятор» и откройте его на телефоне (для идеального эффекта подтвердите добавление ярлыка на экран «Домой»).</div>
               </div>
               <div style="display: flex; gap: 10px; align-items: flex-start;">
                 <span style="background: rgba(255,255,255,0.1); border-radius: 6px; padding: 2px 8px; font-weight: 700; font-family: var(--font-mono); font-size: 0.8rem;">3</span>
@@ -472,30 +472,11 @@
             </div>
           </div>
 
-          <!-- Primary Action Buttons -->
+          <!-- Primary Action Button (Single Click Launch) -->
           <div class="action-buttons-stack">
-            <!-- Mode 1: Single Phone 2-in-1 Simulator (Screen is split, zero tab switching, impossible to close) -->
-            <button class="primary-action-btn test-drive-btn" id="hubOpenSimulatorBtn" style="background: linear-gradient(135deg, #7c3aed, #2563eb); border: 1px solid rgba(168,85,247,0.5); box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);">
-              <i class="fa-solid fa-gamepad"></i>
-              <span>📱 2-в-1: Калькулятор + Консоль (Тренажер)</span>
-            </button>
-            <div style="font-size: 0.72rem; color: #94a3b8; text-align: center; margin-top: -4px;">
-              ⚡ Для 1 телефона: экран разделен, ничего не закрывается!
-            </div>
-            
-            <div class="split-buttons-row" style="margin-top: 8px;">
-              <button class="secondary-action-btn" id="hubOpenCalcBtn" title="Открыть полноэкранный калькулятор (свайп 2 пальцами вниз открывает шторку менталиста)">
-                <i class="fa-solid fa-calculator"></i> Открыть калькулятор
-              </button>
-              <button class="secondary-action-btn" id="hubOpenPeekBtn">
-                <i class="fa-solid fa-eye-slash"></i> Stealth Console
-              </button>
-            </div>
-
-            <!-- Mode 2: Real Stage Performance (2 Phones or PWA) -->
-            <button class="secondary-action-btn" id="hubCopySpectatorBtn" style="margin-top: 6px;">
-              <i class="fa-solid fa-copy"></i>
-              <span>Скопировать ссылку для зрителя</span>
+            <button class="primary-action-btn" id="hubOpenCalcBtn" style="font-size: 1.05rem; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 4px 24px rgba(168, 85, 247, 0.45); padding: 16px 20px;">
+              <i class="fa-solid fa-play"></i>
+              <span>ЗАПУСТИТЬ КАЛЬКУЛЯТОР</span>
             </button>
           </div>
 
@@ -613,51 +594,6 @@
       </div>
     </div>
 
-    <!-- =========================================================
-         INTERACTIVE SIMULATOR (TEST-DRIVE ON ONE SCREEN)
-         ========================================================= -->
-    <div class="simulator-modal-backdrop" id="simulatorModal">
-      <div class="simulator-modal-container">
-        <!-- Floating Performer HUD on Top -->
-        <div class="simulator-hud" id="simulatorHud">
-          <div class="sim-hud-top">
-            <div class="sim-hud-badge">🎮 ТЕСТ-ДРАЙВ (1 ЭКРАН)</div>
-            <div class="sim-hud-live-tag" id="simLiveTag">● LIVE STREAM</div>
-            <button type="button" class="sim-close-btn" id="closeSimulatorBtn">✕ ЗАКРЫТЬ</button>
-          </div>
-
-          <div class="sim-hud-peek-row">
-            <div class="sim-peek-box">
-              <span class="sim-label">ПЕРЕХВАТ (PIN):</span>
-              <span class="sim-val-hero" id="simCapturedPin">----</span>
-            </div>
-            <div class="sim-peek-box">
-              <span class="sim-label">ФИНАЛ (=):</span>
-              <span class="sim-val-result" id="simResult">—</span>
-            </div>
-          </div>
-
-          <div class="sim-hud-formula-row">
-            <span class="sim-label">РАСЧЕТ:</span>
-            <span class="sim-val-expr" id="simLiveExpression">Нажимайте кнопки на калькуляторе ниже...</span>
-          </div>
-
-          <!-- Quick Presets Row in Simulator -->
-          <div class="sim-presets-row">
-            <button type="button" class="sim-preset-btn active" data-sim-preset="phone" id="simPresetPhone">📞 Тел</button>
-            <button type="button" class="sim-preset-btn" data-sim-preset="date" id="simPresetDate">📅 Дата</button>
-            <button type="button" class="sim-preset-btn" data-sim-preset="time" id="simPresetTime">⏰ Время</button>
-            <button type="button" class="sim-preset-btn" data-sim-preset="pin" id="simPresetPin">🔑 PIN</button>
-            <button type="button" class="sim-preset-btn" data-sim-preset="clean" id="simPresetClean">🛡️ Чистый</button>
-          </div>
-        </div>
-
-        <!-- Embedded Interactive Calculator Iframe -->
-        <div class="simulator-iframe-wrap">
-          <iframe class="simulator-iframe" id="simulatorIframe" src="about:blank" title="Калькулятор Зрителя"></iframe>
-        </div>
-      </div>
-    </div>
 
     <!-- STRICT TOAST NOTIFICATION -->
     <div class="toast-capsule" id="toastCapsule">

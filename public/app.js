@@ -992,5 +992,105 @@
     });
   }
 
+  // --- ADD TO HOME SCREEN (PWA SHORTCUT) PROMPT CONTROLLER ---
+  const pwaInstallModal = document.getElementById('pwaInstallModal');
+  const pwaPromptInstallBtn = document.getElementById('pwaPromptInstallBtn');
+  const pwaPromptDismissBtn = document.getElementById('pwaPromptDismissBtn');
+  const pwaPromptIosOkBtn = document.getElementById('pwaPromptIosOkBtn');
+  const pwaPromptCloseBtn = document.getElementById('pwaPromptCloseBtn');
+  const pwaAndroidView = document.getElementById('pwaAndroidView');
+  const pwaIosView = document.getElementById('pwaIosView');
+  const menuInstallPwa = document.getElementById('menuInstallPwa');
+
+  let deferredInstallPrompt = null;
+
+  function isStandaloneApp() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true ||
+           (document.referrer && document.referrer.includes('android-app://'));
+  }
+
+  function showPwaPrompt(force = false) {
+    if (isStandaloneApp()) return; // Already running in standalone PWA mode!
+    if (!force && sessionStorage.getItem('pwa_prompt_dismissed') === '1') {
+      return;
+    }
+
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) && !window.MSStream;
+
+    if (pwaInstallModal) {
+      if (isIos) {
+        if (pwaIosView) pwaIosView.style.display = 'block';
+        if (pwaAndroidView) pwaAndroidView.style.display = 'none';
+      } else {
+        if (pwaIosView) pwaIosView.style.display = 'none';
+        if (pwaAndroidView) pwaAndroidView.style.display = 'block';
+      }
+      pwaInstallModal.style.display = 'flex';
+    }
+  }
+
+  function hidePwaPrompt() {
+    if (pwaInstallModal) {
+      pwaInstallModal.style.display = 'none';
+    }
+    sessionStorage.setItem('pwa_prompt_dismissed', '1');
+  }
+
+  // Intercept Chrome/Android beforeinstallprompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    // Show prompt automatically on launch if not standalone
+    showPwaPrompt(false);
+  });
+
+  // Handle native install click
+  pwaPromptInstallBtn?.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      try {
+        const choiceResult = await deferredInstallPrompt.userChoice;
+        if (choiceResult && choiceResult.outcome === 'accepted') {
+          console.log('[PWA] User accepted installation');
+        }
+      } catch (err) {
+        console.warn('[PWA] prompt error:', err);
+      }
+      deferredInstallPrompt = null;
+    } else {
+      // If prompt not available directly (e.g. Chrome already shown or unsupported browser)
+      alert('Нажмите на меню браузера (три точки ⋮ в верхнем углу) и выберите «Добавить на главный экран».');
+    }
+    hidePwaPrompt();
+  });
+
+  pwaPromptDismissBtn?.addEventListener('click', hidePwaPrompt);
+  pwaPromptIosOkBtn?.addEventListener('click', hidePwaPrompt);
+  pwaPromptCloseBtn?.addEventListener('click', hidePwaPrompt);
+  pwaInstallModal?.addEventListener('click', (e) => {
+    if (e.target === pwaInstallModal) {
+      hidePwaPrompt();
+    }
+  });
+
+  // From 3-dots menu
+  menuInstallPwa?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeMenuModal();
+    showPwaPrompt(true);
+  });
+
+  // Trigger check on startup: if iOS or standard browser without beforeinstallprompt event delay
+  setTimeout(() => {
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) && !window.MSStream;
+    if (isIos) {
+      showPwaPrompt(false);
+    } else if (!isStandaloneApp() && !sessionStorage.getItem('pwa_prompt_dismissed')) {
+      // In case beforeinstallprompt already fired or wasn't supported
+      showPwaPrompt(false);
+    }
+  }, 1000);
+
   updateDisplay();
 })();

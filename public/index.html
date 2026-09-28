@@ -195,11 +195,60 @@
     <!-- Normal 3-dots options menu modal -->
     <div class="modal-overlay" id="menuModal">
       <div class="menu-sheet">
+        <div class="menu-item" id="menuInstallPwa" style="color: #a855f7; font-weight: 600;">📱 Добавить на экран «Домой»</div>
         <div class="menu-item" id="menuHistory">История</div>
         <div class="menu-item" id="menuTheme">Выбрать тему</div>
         <div class="menu-item" id="menuFeedback">Отправить отзыв</div>
         <!-- Secret backdoor: tapping 'Справка' directly opens Secret Settings -->
         <div class="menu-item" id="menuHelp">Справка</div>
+      </div>
+    </div>
+
+    <!-- Add to Home Screen (PWA Shortcut) Modal / Bottom Sheet -->
+    <div class="modal-overlay pwa-install-overlay" id="pwaInstallModal" style="display: none;">
+      <div class="pwa-install-sheet">
+        <div class="pwa-install-header">
+          <div class="pwa-install-badge">
+            <span class="pwa-icon">📱</span>
+            <strong>Калькулятор Chameleon</strong>
+          </div>
+          <button type="button" class="pwa-close-btn" id="pwaPromptCloseBtn" aria-label="Закрыть">✕</button>
+        </div>
+
+        <div class="pwa-install-body">
+          <h3 class="pwa-install-title">Добавить на экран «Домой»</h3>
+          <p class="pwa-install-desc">Запускайте калькулятор на весь экран без рамок браузера и с 100% автономной работой без интернета.</p>
+
+          <!-- Android / Chrome Native 1-Click Install View -->
+          <div class="pwa-platform-view" id="pwaAndroidView">
+            <button type="button" class="pwa-primary-install-btn" id="pwaPromptInstallBtn">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+              </svg>
+              <span>Установить ярлык</span>
+            </button>
+            <button type="button" class="pwa-secondary-btn" id="pwaPromptDismissBtn">Позже</button>
+          </div>
+
+          <!-- iOS Safari Visual Steps View -->
+          <div class="pwa-platform-view" id="pwaIosView" style="display: none;">
+            <div class="pwa-ios-steps">
+              <div class="pwa-ios-step">
+                <span class="pwa-step-num">1</span>
+                <span>Нажмите кнопку <strong>«Поделиться»</strong> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> внизу Safari</span>
+              </div>
+              <div class="pwa-ios-step">
+                <span class="pwa-step-num">2</span>
+                <span>Прокрутите список и выберите <strong>«На экран „Домой“»</strong> ⊞</span>
+              </div>
+              <div class="pwa-ios-step">
+                <span class="pwa-step-num">3</span>
+                <span>В правом верхнем углу нажмите <strong>«Добавить»</strong></span>
+              </div>
+            </div>
+            <button type="button" class="pwa-primary-install-btn" id="pwaPromptIosOkBtn">Понятно</button>
+          </div>
+        </div>
       </div>
     </div>
 
